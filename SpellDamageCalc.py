@@ -60,11 +60,14 @@ class Caster_Class:
         true_damage = (self.addT * spell.abr)
         return {'mag_damage': mag_damage, 'true_damage' : true_damage } 
     
-    # TODO
     def calc_burn(self, spell: Spell):
-        mag_burn = 0 
-        true_burn = 0
-        return {'mag_burn': mag_burn, 'true_burn' : true_burn } 
+        burn_ticks = spell.burn_dura
+
+        total_burn_mag_damage = ((spell.burn_base + (self.cata * (spell.burn_abr))) * (1 + (self.mpb * spell.burn_abr))) + (self.addM * spell.burn_abr)
+        total_burn_true_damage = (self.addT * spell.burn_abr)
+
+        tick_burn_damage = (total_burn_mag_damage / burn_ticks) + (total_burn_true_damage / burn_ticks)
+        return {'total_mag_burn': total_burn_mag_damage, 'total_true_burn' : total_burn_true_damage, 'burn_tick_total' : tick_burn_damage} 
 
     def calc_channel(self, spell: Spell): 
         tick_magic_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
