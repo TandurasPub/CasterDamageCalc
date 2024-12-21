@@ -2,69 +2,96 @@
 
 import numpy as np
 import matplotlib.pyplot as  plt
+from enum import Enum
 
 import tkinter
 from tkinter import ttk
 
+class Limbs(Enum): 
+    HEAD = 1.5
+    BODY = 1.0
+    ARM = 0.8
+    LEG = 0.6
+    HAND = 0.5
+
 class Spell: 
-    def __init__(self, name:str, damage: float, abr: float, catalyst_damage=0, hit_count=0, burn=False, burn_base=0, burn_duration=0, splash_base=0, splash_abr=1, splash_count=0): 
+    def __init__(self, name:str, damage: float, abr=1.0, is_projectile=True, burn=False,
+                  burn_base=0, burn_duration=0, burn_abr=0.5, splash_base=0, splash_abr=1.0, 
+                  is_channel=False, channel_intervals=False, channel_ticks=0, channel_duration=0): 
         self.name = name
         self.damage = damage
         self.abr = abr
-        self.cata = catalyst_damage
-        self.hit_count = hit_count
+        self.is_proj = is_projectile
         self.burn = burn 
         self.burn_base = burn_base
         self.burn_dura = burn_duration
+        self.burn_abr = burn_abr
         self.splash_base = splash_base
         self.splash_abr = splash_abr
-        self.splash_count = splash_count
+        self.is_channel = is_channel
+        self.chan_ints = channel_intervals
+        self.chan_ticks = channel_ticks
+        self.chan_dura = channel_duration
 
-    def set_stats(self, spell_cast_speed=0, magic_power=0, additional_magic=0, additional_true=0): 
-        self.sps = spell_cast_speed
-        self.mpb = magic_power
-        self.addM = additional_magic
-        self.addT = additional_true
-#(
-  #(
-  #  (
- #       + (Base Damage + Buff Weapon Damage) * Combo Multiplier * Impact Zone Multiplier
- #       + Gear Weapon Damage|Magical Damage
- #       + Divine Strike Damage
- #   )
-#    * (1 + Power Bonus)
-#    + Additional Damage
-#  )
-#  * (1 + Hit Location Bonus)
-#  * (1 + Race Damage Bonus)
-#  * (1 - Race Damage Reduction)
-#  * (1 - Damage Reduction * (1 + Damage Reduction Mod) * (1 - Penetration))
-#  * (1 - Projectile Reduction)
-#)
-#* Projectile Falloff
-#+ True Damage
+class Caster_Class: 
+    def __init__(self, name: str, spell_list = {}, sps=0, mpb=0, cata=0, addM=0, addT=0): 
+        self.name = name
+        self.spell_list = spell_list
+        self.sps = sps
+        self.mpb = mpb
+        self.cata = cata
+        self.addM = addM
+        self.addT = addT
+        
+    def set_player_stats(self, sps=0, mpb=0, cata=0, addM=0, addT=0): 
+        self.sps = sps
+        self.mpb = mpb
+        self.cata = cata
+        self.addM = addM
+        self.addT = addT
 
-    def calc_splash(self): 
-        mag_damage = ((self.splash_base + (self.cata * (self.splash_abr)) * (1 + (self.mpb * self.splash_abr))) * (1 + (self.mpb * self.splash_abr))) + (self.addM * self.splash_abr)
-        true_damage = (self.addT * self.splash_abr)
+    def calc_splash(self, spell: Spell): 
+        mag_damage = ((spell.splash_base + (self.cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
+        true_damage = (self.addT * spell.splash_abr)
         return mag_damage, true_damage
+    
+    def calc_impact(self, spell: Spell): 
+        mag_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
+        true_damage = (self.addT * spell.abr)
+        return mag_damage, true_damage 
+    
+    # TODO
+    def calc_burn(self, spell: Spell):
+        mag_burn = 0 
+        true_burn = 0
+        return mag_burn, true_burn
 
+    def calc_channel(self, spell: Spell): 
+        tick_magic_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
+        tick_true_damage = (self.addT * spell.abr)
 
-    def raw_damage_calc(self): 
-        magic_damage = 0
-        true_damage = 0
+        mag_damage = spell.chan_ticks * tick_magic_damage
+        true_damage = spell.chan_ticks * tick_true_damage
 
-        splash_mag, splash_true = self.calc_splash()
+        final_dura = (spell.chan_dura / ( 1 + self.sps)) 
 
-        if self.splash_count >= 1:
-            splash_damage = self.calc_splash()
+        return mag_damage, true_damage, final_dura 
+    
+    def calc_damage(self, spell: Spell): 
+        damage_dict = {}
 
-        if self.hit_count > 0: 
-            spell_damage = self.damage * self.hit_count
-            magic_damage = self.additional_magic * self.hit_count
-            true_damage = self.additional_true * self.hit_count
-        return spell_damage, magic_damage, true_damage
+        damage_dict['single impact'] = self.calc_impact(spell)
 
+        if spell.splash_base > 0: 
+            damage_dict['splash'] = self.calc_splash(spell)
+
+        if spell.burn: 
+            damage_dict['burn'] = self.calc_burn(spell)
+        
+        if spell.is_channel:
+            damage_dict['total channel'] = self.calc_channel(spell)
+
+        return damage_dict
 
 
 def generate_graph(): 
