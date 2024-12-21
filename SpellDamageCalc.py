@@ -58,13 +58,13 @@ class Caster_Class:
     def calc_impact(self, spell: Spell): 
         mag_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
         true_damage = (self.addT * spell.abr)
-        return mag_damage, true_damage 
+        return {'mag_damage': mag_damage, 'true_damage' : true_damage } 
     
     # TODO
     def calc_burn(self, spell: Spell):
         mag_burn = 0 
         true_burn = 0
-        return mag_burn, true_burn
+        return {'mag_burn': mag_burn, 'true_burn' : true_burn } 
 
     def calc_channel(self, spell: Spell): 
         tick_magic_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
@@ -75,7 +75,7 @@ class Caster_Class:
 
         final_dura = (spell.chan_dura / ( 1 + self.sps)) 
 
-        return mag_damage, true_damage, final_dura 
+        return {'mag_damage': mag_damage, 'true_damage' : true_damage, 'final_duration' : final_dura } 
     
     def calc_damage(self, spell: Spell): 
         damage_dict = {}
