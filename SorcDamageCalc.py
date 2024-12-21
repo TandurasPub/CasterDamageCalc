@@ -7,38 +7,62 @@ import tkinter
 from tkinter import ttk
 
 class Spell: 
-    
-    def __init__(self, name:str, damage: float, scaling: float, hit_count=0, burn=False, burn_duration=0, additional_magic=0, additional_true=0, magic_power=0): 
+    def __init__(self, name:str, damage: float, abr: float, catalyst_damage=0, hit_count=0, burn=False, burn_base=0, burn_duration=0, splash_base=0, splash_abr=1, splash_count=0): 
         self.name = name
         self.damage = damage
-        self.scaling = scaling
+        self.abr = abr
+        self.cata = catalyst_damage
         self.hit_count = hit_count
         self.burn = burn 
-        self.burn_duration = burn_duration
-        self.additional_magic = additional_magic
-        self.additional_true = additional_true
-        self.magic_power = magic_power
+        self.burn_base = burn_base
+        self.burn_dura = burn_duration
+        self.splash_base = splash_base
+        self.splash_abr = splash_abr
+        self.splash_count = splash_count
 
-    def set_stats(self, additional_magic=0, additional_true=0, magic_power=0): 
-        self.additional_magic = additional_magic
-        self.additional_true = additional_true
-        self.magic_power = magic_power
+    def set_stats(self, spell_cast_speed=0, magic_power=0, additional_magic=0, additional_true=0): 
+        self.sps = spell_cast_speed
+        self.mpb = magic_power
+        self.addM = additional_magic
+        self.addT = additional_true
+#(
+  #(
+  #  (
+ #       + (Base Damage + Buff Weapon Damage) * Combo Multiplier * Impact Zone Multiplier
+ #       + Gear Weapon Damage|Magical Damage
+ #       + Divine Strike Damage
+ #   )
+#    * (1 + Power Bonus)
+#    + Additional Damage
+#  )
+#  * (1 + Hit Location Bonus)
+#  * (1 + Race Damage Bonus)
+#  * (1 - Race Damage Reduction)
+#  * (1 - Damage Reduction * (1 + Damage Reduction Mod) * (1 - Penetration))
+#  * (1 - Projectile Reduction)
+#)
+#* Projectile Falloff
+#+ True Damage
+
+    def calc_splash(self): 
+        mag_damage = ((self.splash_base + (self.cata * (self.splash_abr)) * (1 + (self.mpb * self.splash_abr))) * (1 + (self.mpb * self.splash_abr))) + (self.addM * self.splash_abr)
+        true_damage = (self.addT * self.splash_abr)
+        return mag_damage, true_damage
+
 
     def raw_damage_calc(self): 
-        spell_damage = 0
         magic_damage = 0
         true_damage = 0
 
+        splash_mag, splash_true = self.calc_splash()
+
+        if self.splash_count >= 1:
+            splash_damage = self.calc_splash()
 
         if self.hit_count > 0: 
             spell_damage = self.damage * self.hit_count
             magic_damage = self.additional_magic * self.hit_count
             true_damage = self.additional_true * self.hit_count
-
-        
-
-
-
         return spell_damage, magic_damage, true_damage
 
 
