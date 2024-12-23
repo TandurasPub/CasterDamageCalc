@@ -37,11 +37,12 @@ class Spell:
         self.chan_dura = channel_duration
 
 class Caster_Class: 
-    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, cata=0.0, addM=0, addT=0): 
+    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, mpen=0.0, cata=0.0, addM=0, addT=0): 
         self.name = name
         self.spell_list = spell_list
         self.sps = sps
         self.mpb = mpb
+        self.mpen=mpen
         self.cata = cata
         self.addM = addM
         self.addT = addT
@@ -56,7 +57,7 @@ class Caster_Class:
     def calc_splash(self, spell: Spell): 
         mag_damage = ((spell.splash_base + (self.cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
         true_damage = (self.addT * spell.splash_abr)
-        return mag_damage, true_damage
+        return {'mag_splash': mag_damage, 'true_splash': true_damage}
     
     def calc_impact(self, spell: Spell): 
         mag_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
@@ -96,13 +97,89 @@ class Caster_Class:
         if spell.splash_base > 0: 
             damage_dict['splash'] = self.calc_splash(spell)
 
-        if spell.burn: 
-            damage_dict['burn'] = self.calc_burn(spell)
-        
         if spell.is_channel:
             damage_dict['total channel'] = self.calc_channel(spell) 
 
+        if spell.burn: 
+            damage_dict['burn'] = self.calc_burn(spell)
+
         return damage_dict
+    
+    def sum_damage_dict(self, damage_dict: dict, spell: Spell): 
+        projectile_magic_damage = 0 
+        magic_damage = 0
+        true_damage = 0 
+        
+        #print(f'========================== initial dict {spell.name} : {damage_dict}')
+
+        if spell.is_proj: 
+            if 'total channel' in damage_dict: 
+                projectile_magic_damage += damage_dict['total channel']['mag_damage']
+                true_damage += damage_dict['total channel']['true_damage']
+            else: 
+                projectile_magic_damage += damage_dict['single impact']['mag_damage']
+                true_damage += damage_dict['single impact']['true_damage']
+
+        else: 
+            if 'total channel' in damage_dict: 
+                magic_damage += damage_dict['total channel']['mag_damage']
+                true_damage += damage_dict['total channel']['true_damage']
+            else: 
+                magic_damage += damage_dict['single impact']['mag_damage']
+                true_damage += damage_dict['single impact']['true_damage']
+
+        if 'burn' in damage_dict: 
+            magic_damage += damage_dict['burn']['total_mag_burn']
+            true_damage += damage_dict['burn']['total_true_burn']
+
+        if 'splash' in damage_dict: 
+            magic_damage += damage_dict['splash']['mag_splash']
+            true_damage += damage_dict['splash']['true_splash']
+
+        sum_damage_dict = {}
+        if magic_damage: 
+            sum_damage_dict['total_mag_damage'] = magic_damage
+        if projectile_magic_damage: 
+            sum_damage_dict['total_proj_mag_damage'] = projectile_magic_damage
+        if true_damage: 
+            sum_damage_dict['total_true_damage'] = true_damage
+   
+
+
+        return sum_damage_dict
+    
+    def calc_post_defensives(self, sum_damage_dict: dict, mdr=0.0, proj_resist=0.0, headshot_reduction=0.0, spell_name=''): 
+
+        proj_dam = 0 
+        magic_dam = 0 
+        true_dam = 0
+
+        #print(f'======================================================{spell_name}: {sum_damage_dict}')
+        # this is gross and can be avoided by populating the numbers with 0
+        # but I don't want to do that because I'm too lazy to go back (and add checks where we need it)
+        if 'total_proj_mag_damage' in sum_damage_dict: 
+            proj_dam = sum_damage_dict['total_proj_mag_damage']
+
+        if 'total_mag_damage' in sum_damage_dict:
+            magic_dam = sum_damage_dict['total_mag_damage']
+
+        if 'total_true_damage' in sum_damage_dict: 
+            true_dam = sum_damage_dict['total_true_damage']
+
+
+        post_proj_magic = proj_dam * ((1 - mdr) * (1 - self.mpen)) * (1 - proj_resist)
+        post_mdr_magic = magic_dam * ((1 - mdr) * (1 - self.mpen))
+
+        total_damage = post_proj_magic + post_mdr_magic + true_dam
+
+        post_resist_dict = {}
+
+        post_resist_dict['post_proj_magic'] = post_proj_magic
+        post_resist_dict['post_mdr_magic'] = post_mdr_magic
+        post_resist_dict['true_damage'] = true_dam
+        post_resist_dict['total_damage'] = total_damage
+
+        return post_resist_dict
     
     def calc_cast_time(self, spell:Spell): 
         modified_cast_time = (spell.cast_time / ( 1 + self.sps)) 
@@ -116,49 +193,6 @@ def load_spells(character_class: str):
         file.close()
 
     return data
-
-# This is hacky - I don't know the 'correct' way to parse the JSON to get correct data types quickly and didn't want to spend time on this
-# Presumably you can create a validation/constructor to use this and it'd be a little cleaner
-def populate_spell_list(caster: Caster_Class): 
-    spell_list = load_spells(caster.name)['spell_list']
-    ret_list = {}
-    for spell in spell_list: 
-        s = Spell(spell['name'])
-        
-        if 'damage' in spell: 
-            s.damage = float(spell['damage'])
-        if 'cast_time' in spell: 
-            s.cast_time = float(spell['cast_time'])
-        if 'abr' in spell: 
-            s.abr = float(spell['abr'])
-        if 'is_projectile' in spell: 
-            s.is_proj = (spell['is_projectile'] == 'True')
-        if 'can_headshot' in spell: 
-            s.can_headshot = (spell['can_headshot'] == 'True')
-        if 'burn' in spell: 
-            s.burn = (spell['burn'] == 'True')
-        if 'burn_base' in spell: 
-            s.burn_base = float(spell['burn_base'])
-        if 'burn_duration' in spell: 
-            s.burn_dura = float(spell['burn_duration'])
-        if 'burn_abr' in spell: 
-            s.burn_abr = float(spell['burn_abr'])
-        if 'splash_base' in spell: 
-            s.splash_base = float(spell['splash_base'])
-        if 'splash_abr' in spell: 
-            s.splash_abr = float(spell['splash_abr'])
-        if 'is_channel' in spell: 
-            s.is_channel = (spell['is_channel'] == 'True')
-        if 'channel_intervals' in spell: 
-            s.chan_ints = (spell['channel_intervals'] == 'True')
-        if 'channel_ticks' in spell: 
-            s.chan_ticks = float(spell['channel_ticks'])
-        if 'channel_duration' in spell: 
-            s.chan_dura = float(spell['channel_duration'])
-
-        ret_list[s.name] = s
-
-    caster.spell_list = ret_list
 
 
 def generate_graph(): 
