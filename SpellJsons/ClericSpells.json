@@ -1,0 +1,59 @@
+{
+    "class": "Cleric", 
+    "spell_list": 
+        [
+            {
+                "name": "Holy Strike",
+                "damage": "20", 
+                "cast_time": 2.0, 
+                "abr": "1.0", 
+                "is_projectile": "False", 
+                "can_headshot": "False",
+                "burn": "False",
+                "burn_base": "0", 
+                "burn_duration": "0", 
+                "burn_abr": "0.0", 
+                "splash_base": "0", 
+                "splash_abr": "0", 
+                "is_channel": "False", 
+                "channel_intervals": "False", 
+                "channel_ticks": "0", 
+                "channel_duration": "0"
+            }, {
+                "name": "Locust Swarm",
+                "damage": "13", 
+                "cast_time": 2.5, 
+                "abr": "0.5", 
+                "is_projectile": "False", 
+                "can_headshot": "False",
+                "burn": "False",
+                "burn_base": "0", 
+                "burn_duration": "0", 
+                "burn_abr": "0.0", 
+                "splash_base": "0", 
+                "splash_abr": "0", 
+                "is_channel": "True", 
+                "channel_intervals": "False", 
+                "channel_ticks": "6", 
+                "channel_duration": "6"
+            },{
+                "name": "Earthquake",
+                "damage": "7", 
+                "cast_time": 2.5, 
+                "abr": "0.5", 
+                "is_projectile": "False", 
+                "can_headshot": "False",
+                "burn": "False",
+                "burn_base": "0", 
+                "burn_duration": "0", 
+                "burn_abr": "0.0", 
+                "splash_base": "0", 
+                "splash_abr": "0", 
+                "is_channel": "True", 
+                "channel_intervals": "False", 
+                "channel_ticks": "6", 
+                "channel_duration": "6"
+            }
+        ]
+}
+
