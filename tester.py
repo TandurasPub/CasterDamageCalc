@@ -32,11 +32,12 @@ class Spell:
         self.chan_dura = channel_duration
 
 class Caster_Class: 
-    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, cata=0.0, addM=0, addT=0): 
+    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, mpen=0.0, cata=0.0, addM=0, addT=0): 
         self.name = name
         self.spell_list = spell_list
         self.sps = sps
         self.mpb = mpb
+        self.mpen=mpen
         self.cata = cata
         self.addM = addM
         self.addT = addT
@@ -51,7 +52,7 @@ class Caster_Class:
     def calc_splash(self, spell: Spell): 
         mag_damage = ((spell.splash_base + (self.cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
         true_damage = (self.addT * spell.splash_abr)
-        return mag_damage, true_damage
+        return {'mag_splash': mag_damage, 'true_splash': true_damage}
     
     def calc_impact(self, spell: Spell): 
         mag_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
@@ -103,8 +104,9 @@ class Caster_Class:
         projectile_magic_damage = 0 
         magic_damage = 0
         true_damage = 0 
+        
+        #print(f'========================== initial dict {spell.name} : {damage_dict}')
 
-        print(damage_dict)
         if spell.is_proj: 
             if 'total channel' in damage_dict: 
                 projectile_magic_damage += damage_dict['total channel']['mag_damage']
@@ -125,6 +127,10 @@ class Caster_Class:
             magic_damage += damage_dict['burn']['total_mag_burn']
             true_damage += damage_dict['burn']['total_true_burn']
 
+        if 'splash' in damage_dict: 
+            magic_damage += damage_dict['splash']['mag_splash']
+            true_damage += damage_dict['splash']['true_splash']
+
         sum_damage_dict = {}
         if magic_damage: 
             sum_damage_dict['total_mag_damage'] = magic_damage
@@ -132,8 +138,43 @@ class Caster_Class:
             sum_damage_dict['total_proj_mag_damage'] = projectile_magic_damage
         if true_damage: 
             sum_damage_dict['total_true_damage'] = true_damage
+   
+
 
         return sum_damage_dict
+    
+    def calc_post_defensives(self, sum_damage_dict: dict, mdr=0.0, proj_resist=0.0, headshot_reduction=0.0, spell_name=''): 
+
+        proj_dam = 0 
+        magic_dam = 0 
+        true_dam = 0
+
+        #print(f'======================================================{spell_name}: {sum_damage_dict}')
+        # this is gross and can be avoided by populating the numbers with 0
+        # but I don't want to do that because I'm too lazy to go back (and add checks where we need it)
+        if 'total_proj_mag_damage' in sum_damage_dict: 
+            proj_dam = sum_damage_dict['total_proj_mag_damage']
+
+        if 'total_mag_damage' in sum_damage_dict:
+            magic_dam = sum_damage_dict['total_mag_damage']
+
+        if 'total_true_damage' in sum_damage_dict: 
+            true_dam = sum_damage_dict['total_true_damage']
+
+
+        post_proj_magic = proj_dam * ((1 - mdr) * (1 - self.mpen)) * (1 - proj_resist)
+        post_mdr_magic = magic_dam * ((1 - mdr) * (1 - self.mpen))
+
+        total_damage = post_proj_magic + post_mdr_magic + true_dam
+
+        post_resist_dict = {}
+
+        post_resist_dict['post_proj_magic'] = post_proj_magic
+        post_resist_dict['post_mdr_magic'] = post_mdr_magic
+        post_resist_dict['true_damage'] = true_dam
+        post_resist_dict['total_damage'] = total_damage
+
+        return post_resist_dict
     
     def calc_cast_time(self, spell:Spell): 
         modified_cast_time = (spell.cast_time / ( 1 + self.sps)) 
@@ -193,19 +234,59 @@ def populate_spell_list(caster: Caster_Class):
     caster.spell_list = ret_list
  
 
-    
 
+# Test code output 
+# TODO add JSONS for class generation 
+'''Roughly something like this
 
+Basically 0-24, 25-125, 125-250, 250+
+With 2 kits for 250+. 
+    Relatively higher Will/MPB, and probably +1/2 true from the choker. Unique book, etc. 
+    Depends on what 'bis' I end up thinking is useful. Actually semi-realistic, or max theoretical w/ full unique max rolls 
 
-#fireball = Spell('fireball', cast_time=2.5, damage=25, abr=1.0, is_projectile=True,
-                 #splash_base=10, splash_abr=1.0,
-                 #burn=True, burn_duration=3, burn_base=3, burn_abr=0.5)
-
-#mm = Spell('magic missile', cast_time=1.25, damage=10, abr = 0.75, is_projectile=True, 
-           #is_channel=True, channel_duration=3, channel_intervals=True, channel_ticks=10)
-
-#wizard_spells = {'fireball' : fireball, 'magic missile': mm}
-
+{
+    "class": "caster1", 
+    "gear_sets":
+        [
+            {
+            "tier": "squire", 
+            "mpb": ___, 
+            "sps": ___, 
+            "cata": ___, 
+            "addM": ___, 
+            "addT": ___,      
+            }, {
+            "tier": "shit_kit", 
+            "mpb": ___, 
+            "sps": ___, 
+            "cata": ___, 
+            "addM": ___, 
+            "addT": ___,      
+            }, {
+            "tier": "mid_kit", 
+            "mpb": ___, 
+            "sps": ___, 
+            "cata": ___, 
+            "addM": ___, 
+            "addT": ___,      
+            }, {
+            "tier": "good_kit", 
+            "mpb": ___, 
+            "sps": ___, 
+            "cata": ___, 
+            "addM": ___, 
+            "addT": ___,      
+            }, 
+            {
+            "tier": "bis_kit", 
+            "mpb": ___, 
+            "sps": ___, 
+            "cata": ___, 
+            "addM": ___, 
+            "addT": ___,      
+            }, 
+        ] 
+'''
 wizard = Caster_Class(name="Wizard")
 wizard.set_player_stats(sps=0.5, mpb=0.22, cata=4, addM=0, addT=4)
 
@@ -221,47 +302,31 @@ cleric.set_player_stats(sps=0.25, mpb=.21, cata=2, addM=0, addT=0)
 druid = Caster_Class(name="Druid")
 druid.set_player_stats(sps=0.25, mpb=.21, cata=2, addM=0, addT=0)
 
-
-
-
 populate_spell_list(wizard) 
 populate_spell_list(cleric)
 populate_spell_list(warlock)
 populate_spell_list(druid)
 populate_spell_list(sorcerer)
 
-print(f'========== Wizard ==========')
-for spell in wizard.spell_list: 
-    print(f'{spell}: {wizard.calc_damage(wizard.spell_list[spell])}')
-    print(f'{spell} total damage: {
-        wizard.sum_damage_dict(
-            wizard.calc_damage(wizard.spell_list[spell]),
-            wizard.spell_list[spell]
-        )
-        }')
-    print(f'{spell} cast time with {wizard.sps*100}% spell cast speed: {wizard.calc_cast_time(wizard.spell_list[spell])}')
+class_dict = {}
+class_dict['wizard'] = wizard
+class_dict['cleric'] = cleric
+class_dict['warlock'] = warlock
+class_dict['druid'] = druid
+class_dict['sorcerer'] = sorcerer
 
-print(f'========== Warlock ==========')
-print(warlock.spell_list)
-for spell in warlock.spell_list: 
-    print(f'{spell}: {warlock.calc_damage(warlock.spell_list[spell])}')
-    print(f'{spell} cast time with {warlock.sps*100}% spell cast speed: {warlock.calc_cast_time(warlock.spell_list[spell])}')
 
-print(f'========== Cleric ==========')
-print(cleric.spell_list)
-for spell in cleric.spell_list: 
-    print(f'{spell}: {cleric.calc_damage(cleric.spell_list[spell])}')
-    print(f'{spell} cast time with {cleric.sps*100}% spell cast speed: {cleric.calc_cast_time(cleric.spell_list[spell])}')
+class_to_display = class_dict['wizard']
 
-print(f'========== Druid ==========')
-print(druid.spell_list)
-for spell in druid.spell_list: 
-    print(f'{spell}: {druid.calc_damage(druid.spell_list[spell])}')
-    print(f'{spell} cast time with {druid.sps*100}% spell cast speed: {druid.calc_cast_time(druid.spell_list[spell])}')
-
-    
-print(f'========== Sorcerer ==========')
-print(sorcerer.spell_list)
-for spell in sorcerer.spell_list: 
-    print(f'{spell}: {sorcerer.calc_damage(sorcerer.spell_list[spell])}')
-    print(f'{spell} cast time with {sorcerer.sps*100}% spell cast speed: {sorcerer.calc_cast_time(sorcerer.spell_list[spell])}')
+for k in class_dict: 
+    print(f'=================== {k} =========================')
+    for spell in class_dict[k].spell_list: 
+        #print(f'{spell}: {class_dict[k].calc_damage(class_dict[k].spell_list[spell])}')
+        print(f'{spell} total damage: {
+            class_dict[k].calc_post_defensives(
+                class_dict[k].sum_damage_dict(
+                    class_dict[k].calc_damage(class_dict[k].spell_list[spell]),
+                    class_dict[k].spell_list[spell]
+                ), spell_name=spell
+            )
+            }')
