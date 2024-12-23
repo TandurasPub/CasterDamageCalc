@@ -105,7 +105,7 @@
                 "channel_ticks": "0", 
                 "channel_duration": "0"
             },{
-                "name": "Hellfire (Experimental)",
+                "name": "Hellfire (1-Second of Damage)",
                 "damage": "60", 
                 "cast_time": 2.0, 
                 "abr": "0.50", 

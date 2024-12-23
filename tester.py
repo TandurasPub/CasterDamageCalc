@@ -1,4 +1,14 @@
 import json
+from enum import Enum
+
+
+class Limbs(Enum): 
+    HEAD = 1.5
+    BODY = 1.0
+    ARM = 0.8
+    LEG = 0.6
+    HAND = 0.5
+
 
 class Spell: 
     def __init__(self, name:str, damage=0, cast_time=0, abr=1.0, is_projectile=True, can_headshot=True, burn=False,
@@ -81,13 +91,49 @@ class Caster_Class:
         if spell.splash_base > 0: 
             damage_dict['splash'] = self.calc_splash(spell)
 
-        if spell.burn: 
-            damage_dict['burn'] = self.calc_burn(spell)
-        
         if spell.is_channel:
             damage_dict['total channel'] = self.calc_channel(spell) 
 
+        if spell.burn: 
+            damage_dict['burn'] = self.calc_burn(spell)
+
         return damage_dict
+    
+    def sum_damage_dict(self, damage_dict: dict, spell: Spell): 
+        projectile_magic_damage = 0 
+        magic_damage = 0
+        true_damage = 0 
+
+        print(damage_dict)
+        if spell.is_proj: 
+            if 'total channel' in damage_dict: 
+                projectile_magic_damage += damage_dict['total channel']['mag_damage']
+                true_damage += damage_dict['total channel']['true_damage']
+            else: 
+                projectile_magic_damage += damage_dict['single impact']['mag_damage']
+                true_damage += damage_dict['single impact']['true_damage']
+
+        else: 
+            if 'total channel' in damage_dict: 
+                magic_damage += damage_dict['total channel']['mag_damage']
+                true_damage += damage_dict['total channel']['true_damage']
+            else: 
+                magic_damage += damage_dict['single impact']['mag_damage']
+                true_damage += damage_dict['single impact']['true_damage']
+
+        if 'burn' in damage_dict: 
+            magic_damage += damage_dict['burn']['total_mag_burn']
+            true_damage += damage_dict['burn']['total_true_burn']
+
+        sum_damage_dict = {}
+        if magic_damage: 
+            sum_damage_dict['total_mag_damage'] = magic_damage
+        if projectile_magic_damage: 
+            sum_damage_dict['total_proj_mag_damage'] = projectile_magic_damage
+        if true_damage: 
+            sum_damage_dict['total_true_damage'] = true_damage
+
+        return sum_damage_dict
     
     def calc_cast_time(self, spell:Spell): 
         modified_cast_time = (spell.cast_time / ( 1 + self.sps)) 
@@ -104,9 +150,10 @@ def load_spells(character_class: str):
 
 # This is hacky - I don't know the 'correct' way to parse the JSON to get correct data types quickly and didn't want to spend time on this
 # Presumably you can create a validation/constructor to use this and it'd be a little cleaner
+# Somehow this list is being shared across caster_classes 
 def populate_spell_list(caster: Caster_Class): 
     spell_list = load_spells(caster.name)['spell_list']
-
+    ret_list = {}
     for spell in spell_list: 
         s = Spell(spell['name'])
         
@@ -141,7 +188,12 @@ def populate_spell_list(caster: Caster_Class):
         if 'channel_duration' in spell: 
             s.chan_dura = float(spell['channel_duration'])
 
-        caster.spell_list[spell['name']] = s
+        ret_list[s.name] = s
+
+    caster.spell_list = ret_list
+ 
+
+    
 
 
 
@@ -154,26 +206,62 @@ def populate_spell_list(caster: Caster_Class):
 
 #wizard_spells = {'fireball' : fireball, 'magic missile': mm}
 
-wizard = Caster_Class(name='wizard')
+wizard = Caster_Class(name="Wizard")
 wizard.set_player_stats(sps=0.5, mpb=0.25, cata=2, addM=1, addT=1)
 
+warlock = Caster_Class(name="Warlock")
+warlock.set_player_stats(sps=.5, mpb=.3, cata=2, addM=0, addT=2)
+
 sorcerer = Caster_Class(name="Sorcerer")
-sorcerer.set_player_stats(sps=0.5, mpb=.25, cata=0, addM=0, addT=5)
+sorcerer.set_player_stats(sps=0.5, mpb=.0, cata=0, addM=0, addT=0)
 
 cleric = Caster_Class(name="Cleric")
-cleric.set_player_stats(sps=0.25, mpb=.21, cata=4, addM=0, addT=4)
+cleric.set_player_stats(sps=0.25, mpb=.21, cata=2, addM=0, addT=0)
+
+druid = Caster_Class(name="Druid")
+druid.set_player_stats(sps=0.25, mpb=.21, cata=2, addM=0, addT=0)
+
+
+
 
 populate_spell_list(wizard) 
 populate_spell_list(cleric)
+populate_spell_list(warlock)
+populate_spell_list(druid)
+populate_spell_list(sorcerer)
 
 print(f'========== Wizard ==========')
 for spell in wizard.spell_list: 
     print(f'{spell}: {wizard.calc_damage(wizard.spell_list[spell])}')
+    print(f'{spell} total damage: {
+        wizard.sum_damage_dict(
+            wizard.calc_damage(wizard.spell_list[spell]),
+            wizard.spell_list[spell]
+        )
+        }')
     print(f'{spell} cast time with {wizard.sps*100}% spell cast speed: {wizard.calc_cast_time(wizard.spell_list[spell])}')
 
+print(f'========== Warlock ==========')
+print(warlock.spell_list)
+for spell in warlock.spell_list: 
+    print(f'{spell}: {warlock.calc_damage(warlock.spell_list[spell])}')
+    print(f'{spell} cast time with {warlock.sps*100}% spell cast speed: {warlock.calc_cast_time(warlock.spell_list[spell])}')
 
 print(f'========== Cleric ==========')
 print(cleric.spell_list)
 for spell in cleric.spell_list: 
     print(f'{spell}: {cleric.calc_damage(cleric.spell_list[spell])}')
     print(f'{spell} cast time with {cleric.sps*100}% spell cast speed: {cleric.calc_cast_time(cleric.spell_list[spell])}')
+
+print(f'========== Druid ==========')
+print(druid.spell_list)
+for spell in druid.spell_list: 
+    print(f'{spell}: {druid.calc_damage(druid.spell_list[spell])}')
+    print(f'{spell} cast time with {druid.sps*100}% spell cast speed: {druid.calc_cast_time(druid.spell_list[spell])}')
+
+    
+print(f'========== Sorcerer ==========')
+print(sorcerer.spell_list)
+for spell in sorcerer.spell_list: 
+    print(f'{spell}: {sorcerer.calc_damage(sorcerer.spell_list[spell])}')
+    print(f'{spell} cast time with {sorcerer.sps*100}% spell cast speed: {sorcerer.calc_cast_time(sorcerer.spell_list[spell])}')

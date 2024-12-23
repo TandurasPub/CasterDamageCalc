@@ -1,5 +1,6 @@
 #Sorcerer Damage calc for Hotfix 36 of Dark and Darker
 
+import json
 import numpy as np
 import matplotlib.pyplot as  plt
 from enum import Enum
@@ -15,7 +16,7 @@ class Limbs(Enum):
     HAND = 0.5
 
 class Spell: 
-    def __init__(self, name:str, damage: float, cast_time: float, abr=1.0, is_projectile=True, can_headshot=True, burn=False,
+    def __init__(self, name:str, damage=0, cast_time=0, abr=1.0, is_projectile=True, can_headshot=True, burn=False,
                   burn_base=0, burn_duration=0, burn_abr=0.5, splash_base=0, splash_abr=1.0, 
                   is_channel=False, channel_intervals=False, channel_ticks=0, channel_duration=0): 
         self.name = name
@@ -36,7 +37,7 @@ class Spell:
         self.chan_dura = channel_duration
 
 class Caster_Class: 
-    def __init__(self, name: str, spell_list = {}, sps=0, mpb=0, cata=0, addM=0, addT=0): 
+    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, cata=0.0, addM=0, addT=0): 
         self.name = name
         self.spell_list = spell_list
         self.sps = sps
@@ -69,16 +70,21 @@ class Caster_Class:
         total_burn_true_damage = (self.addT * spell.burn_abr)
 
         tick_burn_damage = (total_burn_mag_damage / burn_ticks) + (total_burn_true_damage / burn_ticks)
-        return {'total_mag_burn': total_burn_mag_damage, 'total_true_burn' : total_burn_true_damage, 'burn_tick_total' : tick_burn_damage} 
+        return {'total_mag_burn': total_burn_mag_damage, 'total_true_burn' : total_burn_true_damage, 'burn_tick' : tick_burn_damage} 
 
     def calc_channel(self, spell: Spell): 
+
+        final_dura = (spell.chan_dura / ( 1 + self.sps)) 
         tick_magic_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
         tick_true_damage = (self.addT * spell.abr)
 
-        mag_damage = spell.chan_ticks * tick_magic_damage
-        true_damage = spell.chan_ticks * tick_true_damage
+        if spell.chan_ints: 
+            spell_ticks = spell.chan_ticks 
+        else: 
+            spell_ticks = final_dura
 
-        final_dura = (spell.chan_dura / ( 1 + self.sps)) 
+        mag_damage = spell_ticks * tick_magic_damage
+        true_damage = spell_ticks * tick_true_damage
 
         return {'mag_damage': mag_damage, 'true_damage' : true_damage, 'final_duration' : final_dura } 
     
@@ -94,14 +100,65 @@ class Caster_Class:
             damage_dict['burn'] = self.calc_burn(spell)
         
         if spell.is_channel:
-            damage_dict['total channel'] = self.calc_channel(spell)
+            damage_dict['total channel'] = self.calc_channel(spell) 
 
         return damage_dict
-
+    
     def calc_cast_time(self, spell:Spell): 
         modified_cast_time = (spell.cast_time / ( 1 + self.sps)) 
 
         return modified_cast_time
+    
+
+def load_spells(character_class: str): 
+    with open(f'SpellJsons/{character_class}Spells.json', 'r') as file: 
+        data = json.load(file)
+        file.close()
+
+    return data
+
+# This is hacky - I don't know the 'correct' way to parse the JSON to get correct data types quickly and didn't want to spend time on this
+# Presumably you can create a validation/constructor to use this and it'd be a little cleaner
+def populate_spell_list(caster: Caster_Class): 
+    spell_list = load_spells(caster.name)['spell_list']
+    ret_list = {}
+    for spell in spell_list: 
+        s = Spell(spell['name'])
+        
+        if 'damage' in spell: 
+            s.damage = float(spell['damage'])
+        if 'cast_time' in spell: 
+            s.cast_time = float(spell['cast_time'])
+        if 'abr' in spell: 
+            s.abr = float(spell['abr'])
+        if 'is_projectile' in spell: 
+            s.is_proj = (spell['is_projectile'] == 'True')
+        if 'can_headshot' in spell: 
+            s.can_headshot = (spell['can_headshot'] == 'True')
+        if 'burn' in spell: 
+            s.burn = (spell['burn'] == 'True')
+        if 'burn_base' in spell: 
+            s.burn_base = float(spell['burn_base'])
+        if 'burn_duration' in spell: 
+            s.burn_dura = float(spell['burn_duration'])
+        if 'burn_abr' in spell: 
+            s.burn_abr = float(spell['burn_abr'])
+        if 'splash_base' in spell: 
+            s.splash_base = float(spell['splash_base'])
+        if 'splash_abr' in spell: 
+            s.splash_abr = float(spell['splash_abr'])
+        if 'is_channel' in spell: 
+            s.is_channel = (spell['is_channel'] == 'True')
+        if 'channel_intervals' in spell: 
+            s.chan_ints = (spell['channel_intervals'] == 'True')
+        if 'channel_ticks' in spell: 
+            s.chan_ticks = float(spell['channel_ticks'])
+        if 'channel_duration' in spell: 
+            s.chan_dura = float(spell['channel_duration'])
+
+        ret_list[s.name] = s
+
+    caster.spell_list = ret_list
 
 
 def generate_graph(): 
