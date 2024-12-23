@@ -207,7 +207,7 @@ def populate_spell_list(caster: Caster_Class):
 #wizard_spells = {'fireball' : fireball, 'magic missile': mm}
 
 wizard = Caster_Class(name="Wizard")
-wizard.set_player_stats(sps=0.5, mpb=0.25, cata=2, addM=1, addT=1)
+wizard.set_player_stats(sps=0.5, mpb=0.22, cata=4, addM=0, addT=4)
 
 warlock = Caster_Class(name="Warlock")
 warlock.set_player_stats(sps=.5, mpb=.3, cata=2, addM=0, addT=2)
