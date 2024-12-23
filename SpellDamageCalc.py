@@ -15,13 +15,15 @@ class Limbs(Enum):
     HAND = 0.5
 
 class Spell: 
-    def __init__(self, name:str, damage: float, abr=1.0, is_projectile=True, burn=False,
+    def __init__(self, name:str, damage: float, cast_time: float, abr=1.0, is_projectile=True, can_headshot=True, burn=False,
                   burn_base=0, burn_duration=0, burn_abr=0.5, splash_base=0, splash_abr=1.0, 
                   is_channel=False, channel_intervals=False, channel_ticks=0, channel_duration=0): 
         self.name = name
         self.damage = damage
+        self.cast_time = cast_time
         self.abr = abr
         self.is_proj = is_projectile
+        self.can_headshot = can_headshot
         self.burn = burn 
         self.burn_base = burn_base
         self.burn_dura = burn_duration
@@ -95,6 +97,11 @@ class Caster_Class:
             damage_dict['total channel'] = self.calc_channel(spell)
 
         return damage_dict
+
+    def calc_cast_time(self, spell:Spell): 
+        modified_cast_time = (spell.cast_time / ( 1 + self.sps)) 
+
+        return modified_cast_time
 
 
 def generate_graph(): 
