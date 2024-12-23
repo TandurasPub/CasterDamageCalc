@@ -9,6 +9,5 @@ TODO:
     Add Spell Generator to create new spells and damage profiles 
     Generate Gear Loadout Profiles 
     Add Gear Profile Generator to create new gearsets for comparisons 
-
     Add Data visualization portions for spells + additional damage breakdowns
     
