@@ -5,7 +5,7 @@ Tester is  testing code w/ text output for calculations while the GUI isn't crea
 
 TODO: 
     The GUI (gross)
-      Probably in a Django web-app, but no idea yet. Might end up just being another TKinter shit box like the previous to get it working
+    Initial hyper-optimistic goal a Django web-app, but we'll see how long the motivation lasts. Might end up just being another TKinter shit box like the previous to get it working
     Finish Generating Class Spell List JSONs
     Add Spell Generator to create new spells and damage profiles 
     Generate Gear Loadout Profiles 
