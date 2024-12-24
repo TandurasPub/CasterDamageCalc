@@ -1,0 +1,16 @@
+
+build/tester/localpycs/pyimod01_archive.pyc
+actualtester.py
+build/tester/Analysis-00.toc
+build/tester/base_library.zip
+build/tester/EXE-00.toc
+build/tester/localpycs/pyimod02_importers.pyc
+build/tester/localpycs/pyimod03_ctypes.pyc
+build/tester/localpycs/pyimod04_pywin32.pyc
+build/tester/localpycs/struct.pyc
+build/tester/PKG-00.toc
+build/tester/PYZ-00.pyz
+build/tester/PYZ-00.toc
+build/tester/tester.pkg
+build/tester/warn-tester.txt
+build/tester/xref-tester.html

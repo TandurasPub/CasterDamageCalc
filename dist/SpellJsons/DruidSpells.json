@@ -1,0 +1,25 @@
+{
+    "class": "Druid", 
+    "spell_list": 
+        [
+            {
+                "name": "Dreamfire",
+                "damage": 15, 
+                "cast_time": 1.0, 
+                "abr": 1.0, 
+                "is_projectile": "False", 
+                "can_headshot": "False",
+                "burn": "False",
+                "burn_base": 0, 
+                "burn_duration": 0, 
+                "burn_abr": 0.0, 
+                "splash_base": "0", 
+                "splash_abr": "0", 
+                "is_channel": "False", 
+                "channel_intervals": "False", 
+                "channel_ticks": "0", 
+                "channel_duration": "0"
+            }
+        ]
+}
+
