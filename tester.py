@@ -407,12 +407,14 @@ while class_selection != 'exit':
 
     if class_selection == 'exit': 
         break
-
+    
     gearset_selection = input(f'Enter Gearset {gearset_list}:')
     if gearset_selection == 'exit': 
         break
 
     if class_selection == 'all': 
+        for k in class_dict: 
+            class_dict[k].set_gearset(gearset_selection)
         display_all()
     else: 
         display_single_class(class_selection)
