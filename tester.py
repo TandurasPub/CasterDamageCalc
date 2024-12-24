@@ -334,7 +334,7 @@ display_all = False
 def display_all(): 
     for k in class_dict: 
         print(f'=================== {k} =========================')
-        print(f'{k} stats | mpb: {class_dict[k].mpb * 100}% | sps: {class_dict[k].sps * 100}% | catalyst_damage: {class_dict[k].cata} | add_mag: {class_dict[k].addM} | add_true: {class_dict[k].addT} |')
+        print(f'{k} stats | mpb: {(class_dict[k].mpb * 100):.2f}% | sps: {class_dict[k].sps * 100}% | catalyst_damage: {class_dict[k].cata} | add_mag: {class_dict[k].addM} | add_true: {class_dict[k].addT} |')
         print(f'Target stats | mdr: {opp_mdr*100}% | proj_resist: {opp_proj_resist*100}% |')
         for spell in class_dict[k].spell_list: 
 
@@ -369,7 +369,7 @@ def display_single_class(class_selection):
     class_to_display.set_gearset(gearset_selection)
 
     print(f'=================== {class_to_display.name} =========================')
-    print(f'{class_to_display.name} stats | mpb: {class_to_display.mpb * 100}% | sps: {class_to_display.sps * 100}% | book_dam: {class_to_display.cata} | add_mag: {class_to_display.addM} | add_true: {class_to_display.addT} |')
+    print(f'{class_to_display.name} stats | mpb: {(class_to_display.mpb * 100):.2f}% | sps: {class_to_display.sps * 100}% | book_dam: {class_to_display.cata} | add_mag: {class_to_display.addM} | add_true: {class_to_display.addT} |')
     print(f'Target stats | mdr: {opp_mdr*100}% | proj_resist: {opp_proj_resist*100}% |')
        
     for spell in class_to_display.spell_list: 
