@@ -37,7 +37,7 @@
                 "channel_ticks": "6", 
                 "channel_duration": "6"
             },{
-                "name": "Earthquake",
+                "name": "Earthquake (Not sure step count per second)",
                 "damage": "7", 
                 "cast_time": 2.5, 
                 "abr": "0.5", 

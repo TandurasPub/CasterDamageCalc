@@ -15,10 +15,18 @@ class Limbs(Enum):
     LEG = 0.6
     HAND = 0.5
 
+class Limbs(Enum): 
+    HEAD = 1.5
+    BODY = 1.0
+    ARM = 0.8
+    LEG = 0.6
+    HAND = 0.5
+
+
 class Spell: 
     def __init__(self, name:str, damage=0, cast_time=0, abr=1.0, is_projectile=True, can_headshot=True, burn=False,
                   burn_base=0, burn_duration=0, burn_abr=0.5, splash_base=0, splash_abr=1.0, 
-                  is_channel=False, channel_intervals=False, channel_ticks=0, channel_duration=0): 
+                  is_channel=False, channel_intervals=False, channel_ticks=0, channel_duration=0, is_merge=False): 
         self.name = name
         self.damage = damage
         self.cast_time = cast_time
@@ -35,11 +43,13 @@ class Spell:
         self.chan_ints = channel_intervals
         self.chan_ticks = channel_ticks
         self.chan_dura = channel_duration
+        self.is_merge = is_merge
 
 class Caster_Class: 
-    def __init__(self, name: str, spell_list = {}, sps=0.0, mpb=0.0, mpen=0.0, cata=0.0, addM=0, addT=0): 
+    def __init__(self, name: str, spell_list = {}, gearsets = {}, sps=0.0, mpb=0.0, mpen=0.0, cata=0.0, addM=0, addT=0): 
         self.name = name
         self.spell_list = spell_list
+        self.gearsets = gearsets
         self.sps = sps
         self.mpb = mpb
         self.mpen=mpen
@@ -54,20 +64,53 @@ class Caster_Class:
         self.addM = addM
         self.addT = addT
 
+    def set_player_stats_from_dict(self, gearset: dict): 
+        self.mpb = gearset['mpb']
+        self.sps = gearset['sps']
+        self.cata = gearset['cata']
+        self.addM = gearset['addM']
+        self.addT = gearset['addT']
+
+    # time to do some fuckery. Load the gearsets into the class's gearset dict, and then swap active gearsets out from this dict for easier access
+    def populate_gearset_list(self): 
+
+        gearsets = load_gear_sets(f'GearsetJsons/CasterGearSets.json')
+        self.gearsets = gearsets['gear_sets']
+
+    
+    def set_gearset(self, gearset='shit_kit'): 
+        self.set_player_stats_from_dict(self.gearsets[gearset]['stats'])
+
     def calc_splash(self, spell: Spell): 
-        mag_damage = ((spell.splash_base + (self.cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
+        if spell.is_merge: 
+            cata = 0
+        else: 
+            cata = self.cata
+
+
+        mag_damage = ((spell.splash_base + (cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
         true_damage = (self.addT * spell.splash_abr)
         return {'mag_splash': mag_damage, 'true_splash': true_damage}
     
     def calc_impact(self, spell: Spell): 
-        mag_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
+        if spell.is_merge: 
+            cata = 0
+        else: 
+            cata = self.cata
+
+        mag_damage = ((spell.damage + (cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
         true_damage = (self.addT * spell.abr)
         return {'mag_damage': mag_damage, 'true_damage' : true_damage } 
     
     def calc_burn(self, spell: Spell):
+        if spell.is_merge: 
+            cata = 0
+        else: 
+            cata = self.cata
+
         burn_ticks = spell.burn_dura
 
-        total_burn_mag_damage = ((spell.burn_base + (self.cata * (spell.burn_abr))) * (1 + (self.mpb * spell.burn_abr))) + (self.addM * spell.burn_abr)
+        total_burn_mag_damage = ((spell.burn_base + (cata* (spell.burn_abr))) * (1 + (self.mpb * spell.burn_abr))) + (self.addM * spell.burn_abr)
         total_burn_true_damage = (self.addT * spell.burn_abr)
 
         tick_burn_damage = (total_burn_mag_damage / burn_ticks) + (total_burn_true_damage / burn_ticks)
@@ -75,8 +118,13 @@ class Caster_Class:
 
     def calc_channel(self, spell: Spell): 
 
+        if spell.is_merge: 
+            cata = 0
+        else: 
+            cata = self.cata
+
         final_dura = (spell.chan_dura / ( 1 + self.sps)) 
-        tick_magic_damage = ((spell.damage + (self.cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
+        tick_magic_damage = ((spell.damage + (cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr) 
         tick_true_damage = (self.addT * spell.abr)
 
         if spell.chan_ints: 
@@ -91,18 +139,17 @@ class Caster_Class:
     
     def calc_damage(self, spell: Spell): 
         damage_dict = {}
-
+  
         damage_dict['single impact'] = self.calc_impact(spell)
 
         if spell.splash_base > 0: 
             damage_dict['splash'] = self.calc_splash(spell)
 
         if spell.is_channel:
-            damage_dict['total channel'] = self.calc_channel(spell) 
+            damage_dict['total channel'] = self.calc_channel(spell)
 
         if spell.burn: 
             damage_dict['burn'] = self.calc_burn(spell)
-
         return damage_dict
     
     def sum_damage_dict(self, damage_dict: dict, spell: Spell): 
@@ -173,11 +220,11 @@ class Caster_Class:
         total_damage = post_proj_magic + post_mdr_magic + true_dam
 
         post_resist_dict = {}
-
+        post_resist_dict['total_damage'] = total_damage
         post_resist_dict['post_proj_magic'] = post_proj_magic
         post_resist_dict['post_mdr_magic'] = post_mdr_magic
         post_resist_dict['true_damage'] = true_dam
-        post_resist_dict['total_damage'] = total_damage
+        
 
         return post_resist_dict
     
@@ -195,142 +242,82 @@ def load_spells(character_class: str):
     return data
 
 
+def load_gear_sets(gear_set_filepath: str): 
+    with open(f'{gear_set_filepath}', 'r') as file: 
+        data = json.load(file)
+        file.close() 
+
+    return data
+
+# This is hacky - I don't know the 'correct' way to parse the JSON to get correct data types quickly and didn't want to spend time on this
+# Presumably you can create a validation/constructor to use this and it'd be a little cleaner
+# Somehow this list is being shared across caster_classes 
+def populate_spell_list(caster: Caster_Class): 
+    spell_list = load_spells(caster.name)['spell_list']
+    ret_list = {}
+
+    for spell in spell_list: 
+        s = Spell(spell['name'])
+        if 'damage' in spell: 
+            s.damage = float(spell['damage'])
+        if 'cast_time' in spell: 
+            s.cast_time = float(spell['cast_time'])
+        if 'abr' in spell: 
+            s.abr = float(spell['abr'])
+        if 'is_projectile' in spell: 
+            s.is_proj = (spell['is_projectile'] == 'True')
+        if 'can_headshot' in spell: 
+            s.can_headshot = (spell['can_headshot'] == 'True')
+        if 'burn' in spell: 
+            s.burn = (spell['burn'] == 'True')
+        if 'burn_base' in spell: 
+            s.burn_base = float(spell['burn_base'])
+        if 'burn_duration' in spell: 
+            s.burn_dura = float(spell['burn_duration'])
+        if 'burn_abr' in spell: 
+            s.burn_abr = float(spell['burn_abr'])
+        if 'splash_base' in spell: 
+            s.splash_base = float(spell['splash_base'])
+        if 'splash_abr' in spell: 
+            s.splash_abr = float(spell['splash_abr'])
+        if 'is_channel' in spell: 
+            s.is_channel = (spell['is_channel'] == 'True')
+        if 'channel_intervals' in spell: 
+            s.chan_ints = (spell['channel_intervals'] == 'True')
+        if 'channel_ticks' in spell: 
+            s.chan_ticks = float(spell['channel_ticks'])
+        if 'channel_duration' in spell: 
+            s.chan_dura = float(spell['channel_duration'])
+        if 'is_merge' in spell: 
+            s.is_merge = (spell['is_merge'] == 'True')
+
+        ret_list[s.name] = s
+
+    caster.spell_list = ret_list
+
 def generate_graph(): 
-    castDam = float(book_entry.get())
-    add = float(add_entry.get())
-    true = float(true_entry.get())
-    mpb = float(mpb_entry.get())/100
+   
 
-    MDR = float(MDR_entry.get())/100
-    projRes = float(projRes_entry.get())/100
-    hsRes = float(hsRes_entry.get())/100
-    debuff = float(debuffDurr_entry.get())/100
-
-    headshot = headshot_combobox.get()
-    if headshot == "Uh, duh. I'm a gamer": 
-        hsMult = (1.5-hsRes)
-    else: 
-        hsMult = 1
-
-    #quick calcs for mult later 
-    funcMDR = (1-MDR)
-    funcProjRes = (1-projRes)
-
-    fullRes = funcMDR
-
-    spellDam = 1
-    spellScale = 1
-    spellBurn = 0
-    spellHit = 1
-    spellProj = 0
-    canHS = 0
-    #"Ignite", "Zap", "Magic Missile", "Ice Bolt", "Explosion", "Fireball (Splash)", "Lightning Strike", "Chain Lightning"
-    spell = spell_combobox.get()
-    
-    if spell == "Ignite": 
-        spellDam = 5
-        spellScale = 0.5
-        spellBurn = 1
-        spellHit = 1
-        canHS = 1
-    elif spell == "Zap": 
-        spellDam = 20
-        spellScale = 1
-        spellBurn = 1
-        spellHit = 1
-    elif spell == "Magic Missile": 
-        spellDam = 11
-        spellScale = 1
-        spellBurn = 0 
-        spellHit = 10
-        spellProj = 1
-    elif spell == "Ice Bolt": 
-        spellDam = 30 
-        spellScale = 1 
-        spellBurn = 0 
-        spellHit = 1
-        spellProj = 1
-    elif spell == "Explosion": 
-        spellDam = 25
-        spellScale = 1
-        spellBurn = 2
-        spellHit = 1
-        spellProj = 1
-    elif spell == "Fireball (Splash)": 
-        spellDam = 15
-        spellScale = 1
-        spellBurn = 2
-        spellHit = 1
-    elif spell == "Fireball (Direct)": 
-        spellDam = 20
-        spellScale = 1
-        spellBurn = 2
-        spellHit = 2
-        spellProj = 1
-    elif spell == "Lightning Strike":
-        spellDam = 30
-        spellScale = 1
-        spellBurn = 0 
-        spellHit = 1
-    elif spell == "Chain Lightning": 
-        spellDam = 30
-        spellScale = 1
-        SpellBurn = 0
-        spellHit = 1
-
-    if spellProj == 1:
-        fullRes = funcMDR*funcProjRes
-    else:
-        fullRes = funcMDR
-
-    dam = (((spellDam + (castDam * spellScale)) * (1 + (mpb*spellScale))) + (add * spellScale))
-
-    if spellProj == 1 or canHS == 1:
-        dam = dam * hsMult
-
-    if spellBurn > 0:
-        dam = dam + ((spellBurn + (0.5 * castDam)) * (1+(0.5 * mpb))) + (0.5 * add) 
-    
-    dam = dam * fullRes
-    
-    if spell == "Fireball (Direct)":
-        dam += ((((10 + castDam) * mpb) + add) * funcMDR)
-        
-
-    dam += (true * spellScale)  
-    
-
-    if spellBurn > 0: 
-        dam += (0.5 * true)
-
-    print("Damage: " + str(dam))
+    #print("Damage: " + str(dam))
 
     # String Building
-    roundedDam = np.round(dam,decimals=2)
-    retStr = "Total Damage: " + str(roundedDam)
-
-    if spell == "Chain Lightning": 
-        bounceReduc = 5.0 * (1+mpb) 
-        bounceReduc = np.round(bounceReduc, 2)
-        retStr = retStr + "\rEach bounce does " + str(bounceReduc) + " less damage" 
-    elif spell == "Magic Missile": 
-        retStr = "Damage per Missile: " + str(roundedDam)
-        retStr = retStr + "\r Total Damage: " + str(np.round(roundedDam * spellHit, 2))
+    #roundedDam = np.round(dam,decimals=2)
+    #retStr = "Total Damage: " + str(roundedDam)
     
-    disp = tkinter.Message(frame, text=retStr)
+    #disp = tkinter.Message(frame, text=retStr)
     disp.grid(row=4, column= 1, sticky="news", padx=15, pady=15)
     
 window = tkinter.Tk()
-window.title("Simple Damage Calc")
+window.title("Caster Damage Calc")
 
 frame = tkinter.Frame(window)
 frame.pack()
 
 # saving user info 
-draw_info_frame = tkinter.LabelFrame(frame, text ="Character Enhancements")
+draw_info_frame = tkinter.LabelFrame(frame, text ="Character Stats")
 draw_info_frame.grid(row= 0, column= 0)
 
-draw_opp_frame = tkinter.LabelFrame(frame, text="Opponent Info (Enter whole %'s, not decimals)")
+draw_opp_frame = tkinter.LabelFrame(frame, text="Opponent Stats (Enter whole %'s, not decimals)")
 draw_opp_frame.grid(row=0, column=1)
 
 MDR_label = tkinter.Label(draw_opp_frame, text="Opponent % MDR:")
@@ -358,7 +345,7 @@ debuffDurr_entry = tkinter.Entry(draw_opp_frame)
 debuffDurr_entry.grid(row=3, column=1)
 
 headshot_label = tkinter.Label(draw_opp_frame, text="Headshot")
-headshot_combobox = ttk.Combobox(draw_opp_frame, values=["Uh, duh. I'm a gamer", "No"])
+headshot_combobox = ttk.Combobox(draw_opp_frame, values=["Yes", "No"])
 headshot_label.grid(row=4, column=0,sticky="w")
 headshot_combobox.grid(row=4, column=1)
 
@@ -402,8 +389,8 @@ spell_combobox.grid(row=4, column=1)
 #inserting defaults 
 book_entry.insert(0, 5)
 add_entry.insert(0, 0)
-true_entry.insert(0, 11)
-mpb_entry.insert(0, 22)
+true_entry.insert(0, 4)
+mpb_entry.insert(0, 50)
 spell_combobox.insert(0, "Zap")
 
 for widget in draw_info_frame.winfo_children():

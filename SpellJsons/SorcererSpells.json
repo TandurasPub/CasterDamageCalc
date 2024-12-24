@@ -37,7 +37,7 @@
                 "channel_ticks": "0", 
                 "channel_duration": "0"
             },{
-                "name": "Windblast (Not sure if this can headshot)",
+                "name": "Windblast",
                 "damage": "10", 
                 "cast_time": 1.5, 
                 "abr": "1.0", 
@@ -168,7 +168,7 @@
                 "burn_abr": "1.0", 
                 "splash_base": "0", 
                 "splash_abr": "0", 
-                "is_channel": "Yes", 
+                "is_channel": "True", 
                 "channel_intervals": "False", 
                 "channel_ticks": "6", 
                 "channel_duration": "6"
@@ -188,7 +188,8 @@
                 "is_channel": "False", 
                 "channel_intervals": "False", 
                 "channel_ticks": "0", 
-                "channel_duration": "0"
+                "channel_duration": "0", 
+                "is_merge": "True"
             },{
                 "name": "Elemental Bolt",
                 "damage": "50", 
@@ -205,9 +206,10 @@
                 "is_channel": "False", 
                 "channel_intervals": "False", 
                 "channel_ticks": "0", 
-                "channel_duration": "0"
+                "channel_duration": "0", 
+                "is_merge": "True"
             },{
-                "name": "Frostflame Spear (Experimental - Channel is used to mark 2 hits)",
+                "name": "Frostflame Spear (Channel to be replaced by custom code)",
                 "damage": "30", 
                 "cast_time": 3.5, 
                 "abr": "1.0", 
@@ -222,7 +224,8 @@
                 "is_channel": "True", 
                 "channel_intervals": "True", 
                 "channel_ticks": "2", 
-                "channel_duration": "1"
+                "channel_duration": "1", 
+                "is_merge": "True"
             },{
                 "name": "Flamethrower (Needs Testing)",
                 "damage": "10", 
@@ -239,7 +242,8 @@
                 "is_channel": "True", 
                 "channel_intervals": "True", 
                 "channel_ticks": "5", 
-                "channel_duration": "5"
+                "channel_duration": "5", 
+                "is_merge": "True"
             },{
                 "name": "Lightning Storm (Needs Testing)",
                 "damage": "10", 
@@ -256,7 +260,8 @@
                 "is_channel": "True", 
                 "channel_intervals": "True", 
                 "channel_ticks": "5", 
-                "channel_duration": "5"
+                "channel_duration": "5", 
+                "is_merge": "True"
             },{
                 "name": "Lightning Vortex",
                 "damage": "30", 
@@ -273,7 +278,8 @@
                 "is_channel": "False", 
                 "channel_intervals": "False", 
                 "channel_ticks": "0", 
-                "channel_duration": "0"
+                "channel_duration": "0", 
+                "is_merge": "True"
             },{
                 "name": "Thorn of Earth",
                 "damage": "25", 
@@ -290,7 +296,8 @@
                 "is_channel": "False", 
                 "channel_intervals": "False", 
                 "channel_ticks": "0", 
-                "channel_duration": "0"
+                "channel_duration": "0", 
+                "is_merge": "True"
             },{
                 "name": "Wall of Fire (Initial Hit)",
                 "damage": "20", 
@@ -307,7 +314,8 @@
                 "is_channel": "False", 
                 "channel_intervals": "False", 
                 "channel_ticks": "0", 
-                "channel_duration": "0"
+                "channel_duration": "0", 
+                "is_merge": "True"
             }
         ]
 }

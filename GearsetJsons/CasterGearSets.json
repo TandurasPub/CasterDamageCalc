@@ -1,0 +1,51 @@
+{
+    "desc": "These are rough estimates of generic values and mostly made up, not factoring in any class perks. Average values were gathered from wizard (bias).",
+    "gear_sets": {
+        "squire": {
+            "stats": {
+                "mpb": 0.29, 
+                "sps": 0.375, 
+                "cata": 1, 
+                "addM": 0, 
+                "addT": 0     
+            }
+        }, 
+        "shit_kit": {
+            "stats": {
+                "mpb": 0.35, 
+                "sps": 0.45, 
+                "cata": 3, 
+                "addM": 2, 
+                "addT": 1      
+            }
+        }, 
+        "mid_kit": {
+            "stats": {
+                "mpb": 0.45, 
+                "sps": 0.6, 
+                "cata": 4, 
+                "addM": 1, 
+                "addT": 3      
+            }
+        }, 
+        "good_kit": {
+            "stats": {
+                "mpb": 0.6, 
+                "sps": 0.75, 
+                "cata": 6, 
+                "addM": 0, 
+                "addT": 7     
+            }
+        }, 
+        "bis_kit": {
+            "stats": {
+                "mpb": 0.925, 
+                "sps": 0.94, 
+                "cata": 7, 
+                "addM": 0, 
+                "addT": 9      
+            }
+        }
+    }
+}
+

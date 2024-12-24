@@ -1,16 +1,13 @@
 SpellDamageCalc will eventually have a GUI interface for generating spells / gear sets to compare the damage/cast and DPS for different spells and classes. 
 
-Tester is  testing code w/ text output for calculations while the GUI isn't created
+Tester is currently all of the functioning Damage Calc code in text output. 
+Edit the JSONs to get the gearsets you want/end up running most frequently to get the damage calcs to line up with what you want. 
 
 
 TODO: 
+    Limb Calculations (in extended damage detail sections)
     The GUI (gross)
-    Initial hyper-optimistic goal a Django web-app, but we'll see how long the motivation lasts. Might end up just being another TKinter shit box like the previous to get it working
-    Finish Generating Class Spell List JSONs
+    It will probably just being another TKinter shit box like the previous to get it working
     Add Spell Generator to create new spells and damage profiles 
-    Generate Gear Loadout Profiles 
     Add Gear Profile Generator to create new gearsets for comparisons 
     Add Data visualization portions for spells + additional damage breakdowns
-    
-BUGS: 
-    Spell imports are fucked and is creating a single spell list. I don't know what fuckery I did to make this happen but I'm dumb and can't find it atm.
