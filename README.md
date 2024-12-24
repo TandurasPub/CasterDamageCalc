@@ -7,10 +7,9 @@ tester.exe instructions:
 Disclaimer - This is dogshit code, and a dogshit exe. This is unlikely to be updated, but any updates to spell damage numbers can be done through the JSON. 
 If IM updates their damage calc in any substantial way, there might be an update, but there's a good chance this won't be updated for damage number changes. The main JSONs might, so check those.
 
-Downloaded tester.exe 
-Download GearsetJsons and SpellJsons folders
-Place tester.exe and the two folders in the same folder
-Run tester.exe and follow the instructions. 
+Downloaded the repo
+Make sure tester.exe and the two folders in the same folder (they should be by default)
+Run tester.exe and follow the instructions. It is case sensitive, and it will crash if you're bad at following instructions. 
 
 
 TODO: 
