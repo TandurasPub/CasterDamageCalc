@@ -330,7 +330,8 @@ class_to_display = class_dict['Sorcerer']
 
 display_all = False
 # calc_cast_time(self, spell:Spell): 
-if display_all:
+
+def display_all(): 
     for k in class_dict: 
         print(f'=================== {k} =========================')
         print(f'{k} stats | mpb: {class_dict[k].mpb * 100}% | sps: {class_dict[k].sps * 100}% | catalyst_damage: {class_dict[k].cata} | add_mag: {class_dict[k].addM} | add_true: {class_dict[k].addT} |')
@@ -359,12 +360,8 @@ if display_all:
                 display_text +=  f' | channel dps: {(total_damage/total_channel_time):.2f}'
 
             print(f'{display_text}') #### This is the actual spell info
-else: 
-    class_list = ["Wizard", "Warlock", "Sorcerer", "Cleric", "Druid"]
-    gearset_list = ["squire", "shit_kit", "mid_kit", "good_kit", "bis_kit"]
 
-    class_selection = input(f'Enter Class {class_list}:')
-    gearset_selection = input(f'Enter Gearset {gearset_list}:')
+def display_single_class(class_selection): 
 
     class_to_display = Caster_Class(name=class_selection)
     populate_spell_list(class_to_display) 
@@ -374,8 +371,8 @@ else:
     print(f'=================== {class_to_display.name} =========================')
     print(f'{class_to_display.name} stats | mpb: {class_to_display.mpb * 100}% | sps: {class_to_display.sps * 100}% | book_dam: {class_to_display.cata} | add_mag: {class_to_display.addM} | add_true: {class_to_display.addT} |')
     print(f'Target stats | mdr: {opp_mdr*100}% | proj_resist: {opp_proj_resist*100}% |')
-    for spell in class_dict[class_to_display.name].spell_list: 
-
+       
+    for spell in class_to_display.spell_list: 
         total_channel_time = 0
 
         damage_dict = class_to_display.calc_damage(class_to_display.spell_list[spell])
@@ -397,5 +394,27 @@ else:
         if total_channel_time: 
             display_text +=  f' | channel dps: {(total_damage/total_channel_time):.2f}'
 
-
         print(f'{display_text}') #### This is the actual spell info
+
+
+class_list = ["all", "wizard", "warlock", "sorcerer", "cleric", "druid"]
+gearset_list = ["squire", "shit_kit", "mid_kit", "good_kit", "bis_kit"]
+
+class_selection = '' 
+while class_selection != 'exit': 
+    print("input 'exit' as an input to end the program.")
+    class_selection = input(f'Enter Class {class_list}:')
+
+    if class_selection == 'exit': 
+        break
+
+    gearset_selection = input(f'Enter Gearset {gearset_list}:')
+    if gearset_selection == 'exit': 
+        break
+
+    if class_selection == 'all': 
+        display_all()
+    else: 
+        display_single_class(class_selection)
+
+    print('====================================================')
