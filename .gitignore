@@ -14,3 +14,4 @@ build/tester/PYZ-00.toc
 build/tester/tester.pkg
 build/tester/warn-tester.txt
 build/tester/xref-tester.html
+tester.spec
