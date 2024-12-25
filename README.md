@@ -4,7 +4,7 @@ Tester is currently all of the functioning Damage Calc code in text output.
 Edit the JSONs to get the gearsets you want/end up running most frequently to get the damage calcs to line up with what you want. 
 
 tester.exe instructions:
-Disclaimer - This is dogshit code, and a dogshit exe. This is unlikely to be updated, but any updates to spell damage numbers can be done through the JSON. 
+Disclaimer - This is dogshit code, and a dogshit exe. You shouldn't be running this as a random exe unless you know how to protect yourself from sketchy exe downloads, or you really trust me (as a random on the internet). This is unlikely to be updated, but any updates to spell damage numbers can be done through the JSON. 
 If IM updates their damage calc in any substantial way, there might be an update, but there's a good chance this won't be updated for damage number changes. The main JSONs might, so check those.
 
 Downloaded the repo
