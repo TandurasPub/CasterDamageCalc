@@ -1,9 +1,11 @@
 # Caster Damage Calc
 
-A damage calc for Dark and Darker casters. This is no where near useable, but if you want the funny numbers feel free to download it. It's currently just text output, horribly formatted, but it's still useful. 
-A GUI is planned, but will likely look equally as awful. 
+A sketchy damage calc for Dark and Darker. It's currently just text output, but it's still as useful as a damage calc for a niche game can be. 
+A GUI is tentatively planned, but will likely look pretty awful. There's a couple of hiccups with spell functionality I'm trying to figure out, and I hate UI work so that GUI might just never come about.
 
-More importantly, opponent gearsets are planned to be added as well, so you can easily swap between 'real' resistance values, but this will be after the GUI work. 
+The goal was to seperate out all of the damage calc formulas from the gearsets/spell information so anyone could keep those updated and get accurate damage numbers and (I think) that's done. 
+If you find any issues (specifically with the calculations / how some spells currently function), let me know. Feel free to DM me on Discord (Tanduras), or just @ me in the relevant chat. 
+
 
 ## Getting Started
 Download the repo, run the code, see the numbers. 
@@ -20,10 +22,10 @@ The JSON the .exe uses is seperate from the one used by the python code because 
 
 
 ### TODO
-* Limb Calculations (in extended damage detail sections)
-* The GUI (gross) - It will probably just being another TKinter shit box like the previous to get it working
+* Limb Calculations - unlikely to be shown in the text display, but needed for GUI stuff
+* The GUI (gross) - It will probably just being another TKinter shit box like the previous to get it working. This will need to be done before anything below.
 * Add Spell Generator to create new spells and damage profiles 
-* Add Gear Profile Generator to create new gearsets for comparisons 
+* Add Gear Profile Generator to more easily create gearsets for comparisons
 * Add Data visualization portions for spells + additional damage breakdowns
 
 
