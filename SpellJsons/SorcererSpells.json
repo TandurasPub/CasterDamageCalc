@@ -122,7 +122,7 @@
                 "channel_ticks": "0", 
                 "channel_duration": "0"
             },{
-                "name": "Lightning Bolt",
+                "name": "Lightning Bolt (Damage shown is lower than initial tests)",
                 "damage": "10", 
                 "cast_time": 1.75, 
                 "abr": "1.0", 
@@ -135,7 +135,7 @@
                 "splash_base": "0", 
                 "splash_abr": "0", 
                 "is_channel": "True", 
-                "channel_intervals": "True", 
+                "channel_intervals": "False", 
                 "channel_ticks": "5", 
                 "channel_duration": "5"
             },{
@@ -240,7 +240,7 @@
                 "splash_base": "0", 
                 "splash_abr": "0.0", 
                 "is_channel": "True", 
-                "channel_intervals": "True", 
+                "channel_intervals": "False", 
                 "channel_ticks": "5", 
                 "channel_duration": "5", 
                 "is_merge": "True"

@@ -54,7 +54,7 @@
                 "channel_ticks": "0", 
                 "channel_duration": "0"
             }, {
-                "name": "Ray of Darkness",
+                "name": "Ray of Darkness (Needs Testing)",
                 "damage": "12", 
                 "cast_time": 1.0, 
                 "abr": "1.0", 
@@ -67,7 +67,7 @@
                 "splash_base": "0", 
                 "splash_abr": "0", 
                 "is_channel": "True", 
-                "channel_intervals": "True", 
+                "channel_intervals": "False", 
                 "channel_ticks": "5", 
                 "channel_duration": "5"
             },{

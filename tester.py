@@ -323,8 +323,8 @@ class_dict['Warlock'] = warlock
 class_dict['Druid'] = druid
 class_dict['Sorcerer'] = sorcerer
 
-opp_mdr = 0.2
-opp_proj_resist = 0.2
+opp_mdr = 0.0
+opp_proj_resist = 0.0
 
 class_to_display = class_dict['Sorcerer']
 
@@ -389,7 +389,7 @@ def display_single_class(class_selection):
 
         text_total_damage = f'total damage: {total_damage:.2f}'
         spell_text = f'{spell}:'
-        display_text = f'{spell_text:70} {text_total_damage:20}'
+        display_text = f'{spell_text:100} {text_total_damage:20}'
 
         if total_channel_time: 
             display_text +=  f' | channel dps: {(total_damage/total_channel_time):.2f}'
@@ -419,4 +419,4 @@ while class_selection != 'exit':
     else: 
         display_single_class(class_selection)
 
-    print('====================================================')
+    print('======================================================')
