@@ -6,6 +6,7 @@ A GUI is tentatively planned, but will likely look pretty awful. There's a coupl
 The goal was to seperate out all of the damage calc formulas from the gearsets/spell information so anyone could keep those updated and get accurate damage numbers and (I think) that's done. 
 If you find any issues (specifically with the calculations / how some spells currently function), let me know. Feel free to DM me on Discord (Tanduras), or just @ me in the relevant chat. 
 
+If anyone from IM ever ends up using this, I expect to get a funny role in the discord.
 
 ## Getting Started
 Download the repo, run the code, see the numbers. 
