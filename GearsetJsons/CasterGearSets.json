@@ -30,7 +30,7 @@
         }, 
         "good_kit": {
             "stats": {
-                "mpb": 0.6, 
+                "mpb": 0.5, 
                 "sps": 0.75, 
                 "cata": 6, 
                 "addM": 0, 
