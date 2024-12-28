@@ -31,3 +31,10 @@ build/SpellDamageCalc/SpellDamageCalc.pkg
 build/SpellDamageCalc/xref-SpellDamageCalc.html
 __pycache__/caster_class.cpython-312.pyc
 __pycache__/spell.cpython-312.pyc
+build/SpellDamageCalc/Analysis-00.toc
+build/SpellDamageCalc/EXE-00.toc
+build/SpellDamageCalc/PKG-00.toc
+build/SpellDamageCalc/SpellDamageCalc.pkg
+build/SpellDamageCalc/xref-SpellDamageCalc.html
+*.toc
+*.toc

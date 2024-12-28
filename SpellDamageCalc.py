@@ -116,7 +116,7 @@ draw_import_frame.grid(row=0, column=0)
 draw_info_frame = tkinter.LabelFrame(frame, text ="Character Stats (Use % values)")
 draw_info_frame.grid(row= 1, column=0)
 
-draw_opp_frame = tkinter.LabelFrame(frame, text="Opponent Stats (Use % values)")
+draw_opp_frame = tkinter.LabelFrame(frame, text="Opponent Stats (Use % values) XXXXX NOT IMPLEMENTED")
 draw_opp_frame.grid(row=1, column=1)
 
 draw_spell_frame = tkinter.LabelFrame(frame, text="Spell Information (Use % values)")
@@ -131,7 +131,6 @@ def set_class_values(self, *args):
 
 
 def set_gearset_values(self, *args):
-
     set_caster_from_gearset()
 
 def set_opponent_gearset_values(self, *args): 
@@ -287,7 +286,7 @@ headshot_combobox.grid(row=4, column=1)
 
 
 # Opponent Stat Defaults
-MDR_entry.insert(0, 20)
+MDR_entry.insert(0, 0)
 projRes_entry.insert(0, 0)
 hsRes_entry.insert(0, 0)
 debuffDurr_entry.insert(0, 0)
