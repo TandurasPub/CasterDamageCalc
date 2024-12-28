@@ -11,25 +11,19 @@ from caster_class import Caster_Class
  
 # Test code output 
 wizard = Caster_Class(name="Wizard")
-wizard.set_player_stats(sps=0.5, mpb=0.50, cata=4, addM=0, addT=8)
 
 warlock = Caster_Class(name="Warlock")
-warlock.set_player_stats(sps=.5, mpb=.4, cata=4, addM=0, addT=4)
 
 sorcerer = Caster_Class(name="Sorcerer")
-sorcerer.set_player_stats(sps=0.50, mpb=.50, cata=0, addM=0, addT=8)
 
 cleric = Caster_Class(name="Cleric")
-cleric.set_player_stats(sps=0.5, mpb=.4, cata=0, addM=0, addT=4)
 
 druid = Caster_Class(name="Druid")
-druid.set_player_stats(sps=0.5, mpb=.4, cata=0, addM=0, addT=4)
 
 full_class_list = [wizard, warlock, sorcerer, cleric, druid]
 
 for caster in full_class_list: 
     caster.populate_gearset_list()
-    caster.set_gearset('mid_kit')
 
 wizard.populate_spell_list() 
 cleric.populate_spell_list()

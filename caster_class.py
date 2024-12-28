@@ -51,7 +51,6 @@ class Caster_Class:
         else: 
             cata = self.cata
 
-
         mag_damage = ((spell.splash_base + (cata * (spell.splash_abr))) * (1 + (self.mpb * spell.splash_abr))) + (self.addM * spell.splash_abr)
         true_damage = (self.addT * spell.splash_abr)
         return {'mag_splash': mag_damage, 'true_splash': true_damage}

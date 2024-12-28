@@ -8,6 +8,31 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 
+def tester(): 
+    for spell in selected_class.spell_list: 
+        total_channel_time = 0
+
+        damage_dict = selected_class.calc_damage(selected_class.spell_list[spell])
+        if 'total channel' in damage_dict: 
+            total_channel_time += damage_dict['total channel']['final_duration']
+
+        post_calc_damage_dict = selected_class.calc_post_defensives(
+                selected_class.sum_damage_dict(
+                    damage_dict,
+                    selected_class.spell_list[spell]
+                ), mdr=0, proj_resist=0, spell_name=spell
+            )
+        total_damage = post_calc_damage_dict['total_damage']
+
+        text_total_damage = f'total damage: {total_damage:.2f}'
+        spell_text = f'{spell}:'
+        display_text = f'{spell_text:100} {text_total_damage:20}'
+
+        if total_channel_time: 
+            display_text +=  f' | channel dps: {(total_damage/total_channel_time):.2f}'
+
+        print(f'{display_text}') #### This is the actual spell info
+
 
 def generate_graph(): 
     #String Building
@@ -17,6 +42,9 @@ def generate_graph():
 
     print(f'burn: {is_burn.get()}')
     disp.grid(row=4, column= 1, sticky="news", padx=15, pady=15)
+
+    print(selected_class.spell_list)
+    tester()
 
 def import_caster(): 
     print("")
@@ -40,8 +68,116 @@ draw_opp_frame.grid(row=1, column=1)
 draw_spell_frame = tkinter.LabelFrame(frame, text="Spell Information (Use % values)")
 draw_spell_frame.grid(row=1, column=2)
 
+# I don't think we need this, but might as well create them for easier modification
+wizard = Caster_Class(name="Wizard")
+warlock = Caster_Class(name="Warlock")
+sorcerer = Caster_Class(name="Sorcerer")
+cleric = Caster_Class(name="Cleric")
+druid = Caster_Class(name="Druid")
+
+# This will need to be manually updated because the import setup I have doesn't include a way to generate classes. Whoops. 
+full_class_list = {"Wizard" : wizard, "Warlock" : warlock, "Sorcerer" : sorcerer, "Cleric" : cleric, "Druid": druid}
+
+
+class_names_list = []
+gearset_list = []
+
+# Go ahead and populate all the loadouts so we're ready to go for calculations later and don't need to worry about this
+for caster in full_class_list:
+    class_names_list.append(caster) 
+    full_class_list[caster].populate_gearset_list()
+    full_class_list[caster].populate_spell_list()
+
+for gearset_name in wizard.gearsets: 
+    gearset_list.append(gearset_name)
+
+#Setting default selected class for reasons
+selected_class = full_class_list['Wizard']
+selected_gearset = gearset_list[0]
+selected_opponent_gearset =''
+
+# This is some super hacky code
+def set_class_values(self, *args): 
+    # Update the spell list to display here
+    selected_class = class_combobox.get()
+    print(f'class selected: {selected_class}')
+
+def set_gearset_values(self, *args):
+    set_caster_from_gearset()
+
+def set_opponent_gearset_values(self, *args): 
+    print('opponent gearset selected')
+
+
+# Class Dropdown
+class_label = tkinter.Label(draw_import_frame, text="Class")
+class_value = StringVar()
+class_combobox = ttk.Combobox(draw_import_frame, textvariable = class_value, values=class_names_list)
+
+class_label.grid(row=0, column=0)
+class_combobox.grid(row=0, column=1)
+
+# Gearset Dropdown 
+gearset_label = tkinter.Label(draw_import_frame, text="Gearset")
+gearset_value = StringVar()
+gearset_combobox = ttk.Combobox(draw_import_frame, textvariable=gearset_value, values=gearset_list)
+
+gearset_label.grid(row=0, column=2)
+gearset_combobox.grid(row=0, column=3)
+
+# Opponent Gearset Dropdown 
+opponent_gearset_label = tkinter.Label(draw_import_frame, text="Opponent Gearset")
+opponent_gearset_value = StringVar()
+opponent_gearset_combobox = ttk.Combobox(draw_import_frame, textvariable=opponent_gearset_value, values=['placeholder1', 'placeholder2', 'placeholder3'])
+
+opponent_gearset_label.grid(row=1, column=0)
+opponent_gearset_combobox.grid(row=1, column=1)
+
+# combobox traces - This is the reason for the super hacky code above
+class_value.trace_add('write', set_class_values)
+gearset_value.trace_add('write', set_gearset_values)
+opponent_gearset_value.trace_add('write', set_opponent_gearset_values)
+
+def set_import_defaults():
+    first_class = next(iter(full_class_list))
+
+    class_combobox.insert(0, first_class)
+
+    selected_class = full_class_list[class_combobox.get()]
+
+    first_gearset = next(iter(full_class_list[selected_class.name].gearsets))
+    gearset_combobox.insert(0, first_gearset)
+
+    opponent_gearset_combobox.insert(0, "placeholder1")
+
+
+set_import_defaults()
+
+
+
+# Modify Gearset Checkbox
+def toggle_modify_gearset(): 
+    for widget in caster_entries: 
+        if modify_gearset.get(): 
+            widget.config(state='normal')
+        else: 
+            widget.config(state='disabled')
+
+modify_gearset = BooleanVar()
+modify_gearset_check = ttk.Checkbutton(draw_import_frame, text='Modify Gearset?', variable=modify_gearset,
+                                  onvalue=1, offvalue=0, command=toggle_modify_gearset)
+modify_gearset_check.grid(row=1, column=3)
+
+
 # Caster Stat Labels
-book_label = tkinter.Label(draw_info_frame, text="Casting Implement Damage:")
+
+book_value = StringVar()
+add_value = StringVar() 
+true_value = StringVar() 
+mpb_value = StringVar()
+sps_value = StringVar()
+
+book_label = tkinter.Label(draw_info_frame,  text="Casting Implement Damage:")
 book_label.grid(row=0, column=0,sticky="w")
 add_label = tkinter.Label(draw_info_frame, text="Additional Magic Damage:")
 add_label.grid(row=1, column=0,sticky="w")
@@ -49,24 +185,47 @@ true_label = tkinter.Label(draw_info_frame, text="Additional True Magic Damage:"
 true_label.grid(row=2, column=0,sticky="w")
 mpb_label = tkinter.Label(draw_info_frame, text="Magic Power Bonus %:")
 mpb_label.grid(row=3, column=0,sticky="w")
+sps_label = tkinter.Label(draw_info_frame, text="Spell Cast Speed %:")
+sps_label.grid(row=4, column=0,sticky="w")
+
 
 # Caster Stat Inputs
-book_entry = tkinter.Entry(draw_info_frame)
+book_entry = tkinter.Entry(draw_info_frame, textvariable=book_value)
 book_entry.grid(row=0, column=1)
-add_entry = tkinter.Entry(draw_info_frame)
+add_entry = tkinter.Entry(draw_info_frame, textvariable=add_value)
 add_entry.grid(row=1, column=1)
-true_entry = tkinter.Entry(draw_info_frame)
+true_entry = tkinter.Entry(draw_info_frame, textvariable=true_value)
 true_entry.grid(row=2, column=1)
-mpb_entry = tkinter.Entry(draw_info_frame)
+mpb_entry = tkinter.Entry(draw_info_frame, textvariable=mpb_value)
 mpb_entry.grid(row=3, column=1)
+sps_entry = tkinter.Entry(draw_info_frame, textvariable=sps_value)
+sps_entry.grid(row=4, column=1)
 
-caster_entries = [book_entry, add_entry, true_entry, mpb_entry]
+caster_entries = [book_entry, add_entry, true_entry, mpb_entry, sps_entry]
 
-# Drop down Spell Selection
-spell_label = tkinter.Label(draw_info_frame, text="Spell")
-spell_combobox = ttk.Combobox(draw_info_frame, values=["Ignite", "Zap", "Magic Missile", "Ice Bolt", "Explosion", "Fireball (Splash)", "Fireball (Direct)", "Lightning Strike", "Chain Lightning"])
-spell_label.grid(row=4, column=0)
-spell_combobox.grid(row=4, column=1)
+
+def set_caster_from_gearset(): 
+    gearset = selected_class.gearsets[gearset_combobox.get()]
+
+    book_value.set(gearset['stats']['cata'])
+    add_value.set(gearset['stats']['addM']) 
+    true_value.set(gearset['stats']['addT']) 
+    mpb_value.set(gearset['stats']['mpb']) 
+    sps_value.set(gearset['stats']['sps']) 
+
+
+set_caster_from_gearset()
+
+# Caster Stat Defaults 
+#book_entry.insert(0, 5)
+#add_entry.insert(0, 0)
+#true_entry.insert(0, 4)
+#mpb_entry.insert(0, 50)
+#sps_entry.insert(0, 25)
+
+
+for entry in caster_entries: 
+    entry.config(state='disabled')
 
 # Opponent Stat Labels
 MDR_label = tkinter.Label(draw_opp_frame, text="Opponent % MDR:")
@@ -99,18 +258,17 @@ headshot_combobox.grid(row=4, column=1)
 
 
 # Opponent Stat Defaults
-MDR_entry.insert(0, 0)
+MDR_entry.insert(0, 20)
 projRes_entry.insert(0, 0)
 hsRes_entry.insert(0, 0)
 debuffDurr_entry.insert(0, 0)
 headshot_combobox.insert(0, "No")
 
 # Caster Stat Defaults 
-book_entry.insert(0, 5)
-add_entry.insert(0, 0)
-true_entry.insert(0, 4)
-mpb_entry.insert(0, 50)
-spell_combobox.insert(0, "Zap")
+#book_entry.insert(0, 5)
+#add_entry.insert(0, 0)
+#true_entry.insert(0, 4)
+#mpb_entry.insert(0, 50)
 
 
 #Spell Generic Inputs/Labels
