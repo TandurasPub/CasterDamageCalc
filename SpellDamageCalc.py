@@ -9,10 +9,51 @@ from tkinter import *
 from tkinter import ttk
 
 
-# This is going to replicate the tester.py
+# This is going to replicate the tester.py output stuff
 # Rough idea -> Create grids for each spell -> output the information for the grid 
 # Then create an 'expand' button that shifts stuff down, and inputs some extra information for the spell
-def tester(): 
+
+
+# This is some gross setup stuff. There's a nicer way to do this, but this is a jank app and it will have continuously more jank
+wizard = Caster_Class(name="Wizard")
+warlock = Caster_Class(name="Warlock")
+sorcerer = Caster_Class(name="Sorcerer")
+cleric = Caster_Class(name="Cleric")
+druid = Caster_Class(name="Druid")
+
+# This will need to be manually updated because the import setup I have doesn't include a way to generate classes. Probably won't go back to change this
+full_class_list = {"Wizard" : wizard, "Warlock" : warlock, "Sorcerer" : sorcerer, "Cleric" : cleric, "Druid": druid}
+
+
+class_names_list = []
+gearset_list = []
+
+# Go ahead and populate all the loadouts so we're ready to go for calculations later and don't need to worry about this
+for caster in full_class_list:
+    class_names_list.append(caster) 
+    full_class_list[caster].populate_gearset_list()
+    full_class_list[caster].populate_spell_list()
+
+for gearset_name in wizard.gearsets: 
+    gearset_list.append(gearset_name)
+
+#Setting default selected class for reasons
+global selected_class 
+global selected_gearset
+selected_class = full_class_list['Sorcerer']
+selected_gearset = gearset_list[0]
+selected_opponent_gearset = ''
+
+
+def display_spell_info(): 
+    spell_count = 0
+
+    if modify_gearset: 
+        selected_class.set_stats(cata=int(book_entry.get()), addM=int(add_entry.get()), addT=int(true_entry.get()), 
+                                 mpb=float(mpb_entry.get()), sps=float(sps_entry.get()))
+    else: 
+        selected_class.set_gearset(gearset_combobox.get())
+    
     for spell in selected_class.spell_list: 
         total_channel_time = 0
 
@@ -35,20 +76,30 @@ def tester():
         if total_channel_time: 
             display_text +=  f' | channel dps: {(total_damage/total_channel_time):.2f}'
 
-        print(f'{display_text}') #### This is the actual spell info
+
+        spell_name_label = tkinter.Label(spell_list_frame, text=f'{spell_text:30}')
+        spell_name_label.grid(row=spell_count, column=0,sticky="w")
+
+        spell_base_label = tkinter.Label(spell_list_frame, text=f'{text_total_damage:30}')
+        spell_base_label.grid(row=spell_count, column=1,sticky="w")
+
+        print(spell)
+        if total_channel_time and (spell != "Frostflame Spear" and spell != "Fire Arrow"): 
+            spell_channel_label = tkinter.Label(spell_list_frame, text=f'  channel dps: {(total_damage/total_channel_time):.2f}')
+            spell_channel_label.grid(row=spell_count, column=2,sticky="w")
+        
+        spell_count += 1
+
+    for widget in spell_list_frame.winfo_children():
+        widget.grid_configure(padx=5, pady=3) 
 
 
 def generate_graph(): 
-    #String Building
-    roundedDam = np.round(10,decimals=2)
-    retStr = "Total Damage: " + str(roundedDam)
-    disp = tkinter.Message(frame, text=retStr)
-
-    print(f'burn: {is_burn.get()}')
-    disp.grid(row=4, column= 1, sticky="news", padx=15, pady=15)
-
-    print(selected_class.spell_list)
-    tester()
+    # There should be a better way to clear out the grid but I can't figure it out
+    # This whole thing is jank, lets see how jank we can get it
+    for widget in spell_list_frame.winfo_children():
+        widget.destroy() 
+    display_spell_info()
 
 def import_caster(): 
     print("")
@@ -72,45 +123,20 @@ draw_opp_frame.grid(row=1, column=1)
 draw_spell_frame = tkinter.LabelFrame(frame, text="Spell Information (Use % values)")
 draw_spell_frame.grid(row=1, column=2)
 
-# I don't think we need this, but might as well create them for easier modification
-wizard = Caster_Class(name="Wizard")
-warlock = Caster_Class(name="Warlock")
-sorcerer = Caster_Class(name="Sorcerer")
-cleric = Caster_Class(name="Cleric")
-druid = Caster_Class(name="Druid")
-
-# This will need to be manually updated because the import setup I have doesn't include a way to generate classes. Whoops. 
-full_class_list = {"Wizard" : wizard, "Warlock" : warlock, "Sorcerer" : sorcerer, "Cleric" : cleric, "Druid": druid}
-
-
-class_names_list = []
-gearset_list = []
-
-# Go ahead and populate all the loadouts so we're ready to go for calculations later and don't need to worry about this
-for caster in full_class_list:
-    class_names_list.append(caster) 
-    full_class_list[caster].populate_gearset_list()
-    full_class_list[caster].populate_spell_list()
-
-for gearset_name in wizard.gearsets: 
-    gearset_list.append(gearset_name)
-
-#Setting default selected class for reasons
-selected_class = full_class_list['Wizard']
-selected_gearset = gearset_list[0]
-selected_opponent_gearset =''
 
 # This is some super hacky code
 def set_class_values(self, *args): 
     # Update the spell list to display here
-    selected_class = class_combobox.get()
-    print(f'class selected: {selected_class}')
+    global selected_class 
+    selected_class = full_class_list[class_combobox.get()]
+
 
 def set_gearset_values(self, *args):
+
     set_caster_from_gearset()
 
 def set_opponent_gearset_values(self, *args): 
-    print('opponent gearset selected')
+    print('')
 
 
 # Class Dropdown
@@ -497,5 +523,11 @@ button.grid(row=4, column= 0, sticky="news", padx=20, pady=20)
 # display 
 disp = tkinter.Message(frame)
 disp.grid(row=4, column= 1, sticky="news", padx=20, pady=20)
+
+
+# Spell Display 
+
+spell_list_frame = tkinter.LabelFrame(frame, text = "Spells")
+spell_list_frame.grid(row=5, column=0)
 
 window.mainloop()

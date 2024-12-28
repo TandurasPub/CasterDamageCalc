@@ -45,6 +45,13 @@ class Caster_Class:
     def set_gearset(self, gearset='shit_kit'): 
         self.set_player_stats_from_dict(self.gearsets[gearset]['stats'])
 
+    def set_stats(self, cata=0, addM=0, addT=0, mpb=0, sps=0): 
+        self.cata = cata
+        self.addM = addM 
+        self.addT = addT 
+        self.mpb = mpb 
+        self.sps = sps
+
     def calc_splash(self, spell: Spell): 
         if spell.is_merge: 
             cata = 0
@@ -60,7 +67,6 @@ class Caster_Class:
             cata = 0
         else: 
             cata = self.cata
-
         mag_damage = ((spell.damage + (cata * (spell.abr))) * (1 + (self.mpb * spell.abr))) + (self.addM * spell.abr)
         true_damage = (self.addT * spell.abr)
         return {'mag_damage': mag_damage, 'true_damage' : true_damage } 

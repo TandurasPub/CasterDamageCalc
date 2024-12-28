@@ -3,47 +3,47 @@
     "gear_sets": {
         "squire": {
             "stats": {
-                "mpb": 0.29, 
-                "sps": 0.375, 
                 "cata": 1, 
                 "addM": 0, 
-                "addT": 0     
+                "addT": 0,
+                "mpb": 0.29, 
+                "sps": 0.375
             }
         }, 
         "shit_kit": {
             "stats": {
-                "mpb": 0.35, 
-                "sps": 0.45, 
                 "cata": 3, 
                 "addM": 2, 
-                "addT": 1      
+                "addT": 1,
+                "mpb": 0.35, 
+                "sps": 0.45    
             }
         }, 
         "mid_kit": {
             "stats": {
-                "mpb": 0.45, 
-                "sps": 0.6, 
                 "cata": 4, 
-                "addM": 1, 
-                "addT": 3      
+                "addM": 1,
+                "addT": 3, 
+                "mpb": 0.45, 
+                "sps": 0.6 
             }
         }, 
         "good_kit": {
             "stats": {
-                "mpb": 0.5, 
-                "sps": 0.75, 
                 "cata": 6, 
-                "addM": 0, 
-                "addT": 7     
+                "addM": 0,
+                "addT": 7,
+                "mpb": 0.5, 
+                "sps": 0.75      
             }
         }, 
         "bis_kit": {
             "stats": {
-                "mpb": 0.925, 
-                "sps": 0.94, 
                 "cata": 7, 
-                "addM": 0, 
-                "addT": 9      
+                "addM": 0,
+                "addT": 9,
+                "mpb": 0.925, 
+                "sps": 0.94
             }
         }
     }

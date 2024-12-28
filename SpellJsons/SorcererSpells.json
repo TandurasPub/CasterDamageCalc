@@ -3,7 +3,7 @@
     "spell_list": 
         [
             {
-                "name": "Fire Arrow (ignore the channel dps)",
+                "name": "Fire Arrow",
                 "damage": 10, 
                 "cast_time": 1.5, 
                 "abr": 1.0, 
@@ -209,7 +209,7 @@
                 "channel_duration": "0", 
                 "is_merge": "True"
             },{
-                "name": "Frostflame Spear (Channel to be replaced by custom code)",
+                "name": "Frostflame Spear",
                 "damage": "30", 
                 "cast_time": 3.5, 
                 "abr": "1.0", 
