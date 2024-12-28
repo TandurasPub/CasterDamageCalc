@@ -15,3 +15,12 @@ build/tester/tester.pkg
 build/tester/warn-tester.txt
 build/tester/xref-tester.html
 tester.spec
+build/SpellDamageCalc/Analysis-00.toc
+build/SpellDamageCalc/EXE-00.toc
+build/SpellDamageCalc/Analysis-00.toc
+build/SpellDamageCalc/EXE-00.toc
+build/SpellDamageCalc/PKG-00.toc
+build/SpellDamageCalc/SpellDamageCalc.pkg
+*.html
+*.pkg
+*.toc
