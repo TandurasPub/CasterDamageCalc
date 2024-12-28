@@ -8,6 +8,10 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 
+
+# This is going to replicate the tester.py
+# Rough idea -> Create grids for each spell -> output the information for the grid 
+# Then create an 'expand' button that shifts stuff down, and inputs some extra information for the spell
 def tester(): 
     for spell in selected_class.spell_list: 
         total_channel_time = 0
