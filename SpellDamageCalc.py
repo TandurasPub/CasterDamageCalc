@@ -83,7 +83,6 @@ def display_spell_info():
         spell_base_label = tkinter.Label(spell_list_frame, text=f'{text_total_damage:30}')
         spell_base_label.grid(row=spell_count, column=1,sticky="w")
 
-        print(spell)
         if total_channel_time and (spell != "Frostflame Spear" and spell != "Fire Arrow"): 
             spell_channel_label = tkinter.Label(spell_list_frame, text=f'  channel dps: {(total_damage/total_channel_time):.2f}')
             spell_channel_label.grid(row=spell_count, column=2,sticky="w")
