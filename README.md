@@ -1,9 +1,14 @@
 # Caster Damage Calc
 
-A sketchy damage calc for Dark and Darker. It's currently just text output, but it's still as useful as a damage calc for a niche game can be. 
-A GUI is tentatively planned, but will likely look pretty awful. There's a couple of hiccups with spell functionality I'm trying to figure out, and I hate UI work so that GUI might just never come about.
+A sketchy damage calc for Dark and Darker, untested values and all. 
+Tester.exe is the text output version and is likely to remain out of date.
+
+SpellDamageCalc.exe is the current exe that's likely to be kept up to date. 
+
+Resistances are currently not being calculated in the GUI version. The Text output has it, and I'm finishing adding this stuff in.
 
 The goal was to seperate out all of the damage calc formulas from the gearsets/spell information so anyone could keep those updated and get accurate damage numbers and (I think) that's done. 
+
 If you find any issues (specifically with the calculations / how some spells currently function), let me know. Feel free to DM me on Discord (Tanduras), or just @ me in the relevant chat. 
 
 If anyone from IM ever ends up using this, I expect to get a funny role in the discord.
@@ -14,8 +19,10 @@ If there are any issues/conflicts DM me and I can see about fixing it, but there
 I have 0 idea how to actually support Mac, and if you're on Linux I'm gonna trust you know how to get it working for yourself. 
 
 ### Prerequisites
-Don't trust random .exes from discord folk unless you really trust the dude, or know how to run them safely. 
+Random warning - don't trust random .exes from discord folk unless you really trust the dude, or know how to run them safely. 
+
 If you do, you can run the .exe found in the dist folder and it should work without any finagling. 
+The .json files in the dist folder can be edited to adjust the pre-sets, and spell balancing.
 
 Otherwise, you can install python and run the code in tester.py yourself for the text-based calculator. 
 
@@ -24,7 +31,7 @@ The JSON the .exe uses is seperate from the one used by the python code because 
 
 ### TODO
 * Limb Calculations - unlikely to be shown in the text display, but needed for GUI stuff
-* The GUI (gross) - It will probably just being another TKinter shit box like the previous to get it working. This will need to be done before anything below.
+* Opponent Resistances for GUI Version
 * Add Spell Generator to create new spells and damage profiles 
 * Add Gear Profile Generator to more easily create gearsets for comparisons
 * Add Data visualization portions for spells + additional damage breakdowns
