@@ -7,7 +7,7 @@ SpellDamageCalc.exe is the current exe that's likely to be kept up to date.
 
 Resistances are currently not being calculated in the GUI version. The Text output has it, and I'm finishing adding this stuff in.
 
-The goal was to seperate out all of the damage calc formulas from the gearsets/spell information so anyone could keep those updated and get accurate damage numbers and (I think) that's done. 
+The goal was to seperate out all of the damage calc formulas from the gearsets/spell information so anyone could keep those updated and get accurate damage numbers and (I think) that's mostly done. 
 
 If you find any issues (specifically with the calculations / how some spells currently function), let me know. Feel free to DM me on Discord (Tanduras), or just @ me in the relevant chat. 
 
@@ -30,13 +30,20 @@ The JSON the .exe uses is seperate from the one used by the python code because 
 
 
 ### TODO
-* Limb Calculations - unlikely to be shown in the text display, but needed for GUI stuff
+* Limb Calculations - unlikely to be updated for the text display, but needed for GUI stuff
 * Opponent Resistances for GUI Version
-* Add Spell Generator to create new spells and damage profiles 
-* Add Gear Profile Generator to more easily create gearsets for comparisons
-* Add Data visualization portions for spells + additional damage breakdowns
+* Limb Calcs added to GUI version
+* (Probably) Add a healing calculator segment for Cleric/Druid
+* (Probably) Add a more info section to display damage breakdowns on multi-hit spells (ex. fireball direct vs. splash vs. burn)
+* (Probably) Add a Perseverance toggle for Cleric opponent (And add in the breakdown)
+* (Maybe) Add a TM Calculator for Warlock
+* (Maybe) Add a debuff calculator for Utility Spell duration (Slow and... ?)
+* (Maybe)
+* (Maybe) Add Spell Profile Save to add tweaked spells and damage profiles 
+* (Maybe) Add Gear Profile Save Function to more easily create gearsets for comparisons
+* (Maybe) Add Data visualization portions for spells + additional damage breakdowns
 
 
 ### Bugs
 * Channel Calcs are wrong, and I'm not sure what's the cause. It looks like channeled spells have 2 extra ticks (with .1s ticks). The math lines up, but the calc doesn't have these factored in, and I'm not certain this is correct. 
-    * Generically, damage over time / channeled spells that do NOT have channel_interval scaling are off by roughly 5-10% depending on spell cast speed and flat damage amounts. 
+    * Generically, this means that damage over time / channeled spells that do NOT have channel_interval scaling are off by roughly 5-10% depending on spell cast speed and flat damage amounts. 
