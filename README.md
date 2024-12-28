@@ -24,7 +24,7 @@ Random warning - don't trust random .exes from discord folk unless you really tr
 If you do, you can run the .exe found in the dist folder and it should work without any finagling. 
 The .json files in the dist folder can be edited to adjust the pre-sets, and spell balancing.
 
-Otherwise, you can install python and run the code in tester.py yourself for the text-based calculator. 
+Otherwise, you can install python and run the code in tester.py / SpellDamageCalc.py yourself for the different calculators. 
 
 The JSON the .exe uses is seperate from the one used by the python code because I'm dumb and lazy. Keep the one you're using updated if you're not grabbing updates from here. 
 
