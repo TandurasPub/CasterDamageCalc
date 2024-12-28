@@ -121,8 +121,6 @@ class Caster_Class:
         magic_damage = 0
         true_damage = 0 
         
-        #print(f'========================== initial dict {spell.name} : {damage_dict}')
-
         if spell.is_proj: 
             if 'total channel' in damage_dict: 
                 projectile_magic_damage += damage_dict['total channel']['mag_damage']
@@ -163,7 +161,6 @@ class Caster_Class:
         magic_dam = 0 
         true_dam = 0
 
-        #print(f'======================================================{spell_name}: {sum_damage_dict}')
         # this is gross and can be avoided by populating the numbers with 0
         # but I don't want to do that because I'm too lazy to go back (and add checks where we need it)
         if 'total_proj_mag_damage' in sum_damage_dict: 
